@@ -49,7 +49,7 @@ file(GLOB Sources
 add_subdirectory(googletest)
 
 add_library(
-    ${project_name} STATIC
+    ${project_name} SHARED
     ${Sources}
     ${Headers})
 
