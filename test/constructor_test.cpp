@@ -15,6 +15,7 @@ TEST(MatrixConstructorTest, initialization_test)
     EXPECT_EQ(row, A.row());
     EXPECT_EQ(col, A.col());
     EXPECT_EQ(row * col, A.size());
+    EXPECT_FALSE(A.is_square());
     // check zero initialization.
     for (size_t i = 0; i < A.row(); i++) {
         for (size_t j = 0; j < A.col(); j++) {
@@ -25,6 +26,7 @@ TEST(MatrixConstructorTest, initialization_test)
 
     // default constructor.
     Matrix B;
+    EXPECT_TRUE(B.is_square());
     EXPECT_EQ(0, B.row());
     EXPECT_EQ(0, B.col());
 }

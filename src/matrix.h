@@ -161,7 +161,7 @@ class Matrix
 
     /**
      * check if the current matrix is symmetric or not based on
-     * input accuracy. Default accuracy is 1e-10.
+     * input threshold. Default threshold is 1e-10.
      *
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
@@ -185,7 +185,7 @@ class Matrix
 
     /**
      * check if the current matrix is a diagonal matrix or not based on
-     * input accuracy. Default accuracy is 1e-10.
+     * input threshold. Default threshold is 1e-10.
      *
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
@@ -210,7 +210,8 @@ class Matrix
 
     /**
      * check if the current matrix is identity or not based on
-     * input accuracy. Default accuracy is 1e-10.
+     * input threshold. Default threshold is 1e-10. The threshold
+     * has to be equal or less than 1e-3 to make sense.
      *
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
@@ -218,8 +219,8 @@ class Matrix
     bool is_identity(double threshold = 1e-10) const
     {
         threshold = std::fabs(threshold);
-        if (fabs(threshold) >= 1) {
-            sig_err("Error to test matrix identity: too big threshold to make sense.\n");
+        if (fabs(threshold) >= 1e-3) {
+            sig_err("Error to test matrix identity: threshold is too big to make sense.\n");
         }
         if (row_ != col_) {
             return false;
@@ -232,6 +233,55 @@ class Matrix
         }
         if (! this->is_diagonal()) {
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * check if the current matrix is a zero matrix or not based on
+     * input threshold. Default threshold is 1e-10. The threshold has
+     * to be equal or less than 1e-3 to make sense.
+     *
+     * @ param [in] threshold the threshold of testing float number's equality.
+     * @ return bool.
+     */
+    bool is_zeros(double threshold = 1e-10) const
+    {
+        threshold = std::fabs(threshold);
+        if (fabs(threshold) >= 1e-3) {
+            sig_err("Error to test zero matrix: threshold is too big to make sense.\n");
+        }
+        const Matrix & T = *this;
+        for (size_t i = 0; i < size_; i++) {
+            if (std::fabs(T.data()[i]) > threshold) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * check if the matrix is square or not.
+     */
+    bool is_square() const {return (row_ == col_);}
+
+    /**
+     * check if two matrix is equal by scanning everything based on
+     * a threshold. By default, the threshold is 1e-10.
+     *
+     * @ param A the compared matrix.
+     * @ return bool
+     */
+    bool is_equal_to(Matrix & A, double threshold = 1e-10) const
+    {
+        threshold = std::fabs(threshold);
+        if (size_ != A.size() || row_ != A.row() || col_ != A.col()) {
+            return false;
+        }
+        for (size_t i = 0; i < size_; i++) {
+            if (std::fabs(data_[i] - A.data()[i]) > threshold) {
+                return false;
+            }
         }
         return true;
     }

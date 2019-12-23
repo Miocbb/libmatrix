@@ -117,3 +117,50 @@ TEST(MatrixTypeCheckTest, is_identity_test)
     EXPECT_FALSE(B.is_identity());
     EXPECT_FALSE(B.is_identity(1e-300));
 }
+
+/**
+ * Test is_zeros() method.
+ */
+TEST(MatrixTypeCheckTest, is_zeros_test)
+{
+    Matrix A(10, 8);
+    // real zero matrix
+    EXPECT_TRUE(A.is_zeros());
+    EXPECT_TRUE(A.is_zeros(1e-16));
+    EXPECT_TRUE(A.is_zeros(1e-300));
+
+    // customized threshold
+    double thred = 1e-8;
+    A(1,1) += thred;
+    EXPECT_FALSE(A.is_zeros(thred/10));
+    EXPECT_TRUE(A.is_zeros(thred * 10));
+
+    // random matrix usually is not zero.
+    A.randomize(0, 1);
+    EXPECT_FALSE(A.is_zeros());
+    //EXPECT_TRUE(A.is_zeros(2));  // lower threshold to be true.
+}
+
+/**
+ * Test is_equal_to() method.
+ */
+TEST(MatrixTypeCheckTest, is_equal_to_test)
+{
+    Matrix A(10, 8);
+    Matrix B(10, 8);
+    // real zero matrix should be equal.
+    EXPECT_TRUE(A.is_equal_to(B));
+    EXPECT_TRUE(A.is_equal_to(B, 1e-16));
+    EXPECT_TRUE(A.is_equal_to(B, 1e-300));
+
+    // customized threshold
+    double thred = 1e-8;
+    A(1,1) += thred;
+    EXPECT_FALSE(A.is_equal_to(B, thred/10));
+    EXPECT_TRUE(A.is_equal_to(B, thred * 10));
+
+    // random matrix usually is not equal to each other.
+    A.randomize(0, 1);
+    B.randomize(0, 1);
+    EXPECT_FALSE(A.is_equal_to(B));
+}
