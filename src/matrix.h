@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <random>
+#include <cmath>
 #include "io.h"
 
 
@@ -149,6 +150,83 @@ class Matrix
            }
         }
         return *this;
+    }
+
+    /**
+     * check if the current matrix is symmetric or not based on
+     * input accuracy. Default accuracy is 1e-10.
+     *
+     * @ param [in] threshold the threshold of testing float number's equality.
+     * @ return bool.
+     */
+    bool is_symmetric(double threshold = 1e-10)
+    {
+        threshold = std::fabs(threshold);
+        if (row_ != col_) {
+            return false;
+        }
+        Matrix & T = *this;
+        for (size_t i = 0; i < row_; i++) {
+            for (size_t j = 0; j < i; j++) {
+                if (std::fabs(T(i, j) - T(j, i)) > threshold) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * check if the current matrix is a diagonal matrix or not based on
+     * input accuracy. Default accuracy is 1e-10.
+     *
+     * @ param [in] threshold the threshold of testing float number's equality.
+     * @ return bool.
+     */
+    bool is_diagonal(double threshold = 1e-10)
+    {
+        threshold = std::fabs(threshold);
+        if (row_ != col_) {
+            return false;
+        }
+        Matrix & T = *this;
+        for (size_t i = 0; i < row_; i++) {
+            for (size_t j = 0; j < i; j++) {
+                if (std::fabs(T(i, j)) > threshold || std::fabs(T(j, i)) > threshold) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * check if the current matrix is identity or not based on
+     * input accuracy. Default accuracy is 1e-10.
+     *
+     * @ param [in] threshold the threshold of testing float number's equality.
+     * @ return bool.
+     */
+    bool is_identity(double threshold = 1e-10)
+    {
+        threshold = std::fabs(threshold);
+        if (fabs(threshold) >= 1) {
+            sig_err("Error to test matrix identity: too big threshold to make sense.\n");
+        }
+        if (row_ != col_) {
+            return false;
+        }
+        Matrix & T = *this;
+        for (size_t i = 0; i < row_; i++) {
+            if (std::fabs(T(i, i) - 1.0) > threshold) {
+                return false;
+            }
+        }
+        if (! this->is_diagonal()) {
+            return false;
+        }
+        return true;
     }
 
     /**
