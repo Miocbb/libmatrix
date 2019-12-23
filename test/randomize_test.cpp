@@ -50,9 +50,12 @@ TEST(MatrixRandomizeTest, repeat_calling_test)
 TEST(RandomMatrixTest, randoness_eyeball_test)
 {
     Matrix A(2, 3);
-    std::cout << "Here is a random general matrix in range [0, 1). Eyeball checking. Does it look alright?\n";
-    std::cout << "Repeating runing test executable, you should always get a different random matrix.\n";
+    std::cout << "Below is a random general matrix in range [0, 1). Eyeball checking. Does it look alright?\n";
+    std::cout << "Random with seed NOT FIXED. You should get a different random matrix at each running time.\n";
     A.randomize(0, 1);
     A.show_full();
-    A.show_lower();
+
+    std::cout << "Random with seed FIXED. You should get the same random matrix at each running time.\n";
+    A.randomize_seed_fixed(0, 1);
+    A.show_full();
 }

@@ -21,6 +21,8 @@ using std::vector;
 using std::size_t;
 using std::string;
 
+static std::mt19937 g_rand_generator_mt19937_seed_fixed(1);
+
 class Matrix
 {
     private:
@@ -150,17 +152,14 @@ class Matrix
     }
 
     /**
-     * make the matrix to be random with elements uniformly distributed in range [a, b).
+     * Make the matrix to be random with elements uniformly distributed in range [a, b).
+     *
+     * THe random number generator is initialized with a non-fixed seed. So the randomness behavior
+     * is not repeatable at running time.
      *
      * @ parameter a left range bound.
      * @ parameter b right range bound.
      * @ return *this the random matrix itself.
-     *
-     * 1. the matrix elements are uniformly distributed in range [a, b).
-     * 2. Calling this method each time should give a different random matrix.
-     * 3. The seed of the random number generator is not fixed,
-     * that is, the random behaviour of this method is not repeatable
-     * when run the executable after compilation.
      */
     const Matrix & randomize(double a, double b)
     {
@@ -170,6 +169,27 @@ class Matrix
         for (size_t i = 0; i < this->row(); i++) {
             for (size_t j = 0; j < this->col(); j++) {
                 (*this)(i, j) = dis(gen);
+            }
+        }
+        return *this;
+    }
+
+    /**
+     * Make the matrix to be random with elements uniformly distributed in range [a, b).
+     *
+     * THe random number generator is initialized with a fixed seed. So the randomness behavior
+     * is repeatable at running time.
+     *
+     * @ parameter a left range bound.
+     * @ parameter b right range bound.
+     * @ return *this the random matrix itself.
+     */
+    const Matrix & randomize_seed_fixed(double a, double b)
+    {
+        std::uniform_real_distribution<> dis(a, b);
+        for (size_t i = 0; i < this->row(); i++) {
+            for (size_t j = 0; j < this->col(); j++) {
+                (*this)(i, j) = dis(g_rand_generator_mt19937_seed_fixed);
             }
         }
         return *this;
