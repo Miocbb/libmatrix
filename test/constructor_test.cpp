@@ -8,11 +8,13 @@ using matrix::Matrix;
  */
 TEST(MatrixConstructorTest, initialization_test)
 {
+    // explicit constructor.
     size_t row = 2;
     size_t col = 3;
     Matrix A(row, col);
     EXPECT_EQ(row, A.row());
     EXPECT_EQ(col, A.col());
+    EXPECT_EQ(row * col, A.size());
     // check zero initialization.
     for (size_t i = 0; i < A.row(); i++) {
         for (size_t j = 0; j < A.col(); j++) {
@@ -20,4 +22,9 @@ TEST(MatrixConstructorTest, initialization_test)
                 << "at position [" << i << "," << j << "]\n";
         }
     }
+
+    // default constructor.
+    Matrix B;
+    EXPECT_EQ(0, B.row());
+    EXPECT_EQ(0, B.col());
 }

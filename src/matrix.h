@@ -14,6 +14,7 @@
 #include <random>
 #include <cmath>
 #include "io.h"
+#include "blas_base.h"
 
 
 namespace matrix {
@@ -29,6 +30,7 @@ class Matrix
     private:
     size_t row_;
     size_t col_;
+    size_t size_;
     vector<double> data_;
 
     public:
@@ -43,14 +45,14 @@ class Matrix
      * @ param col column number of matrix
      */
     Matrix(size_t row, size_t col)
-    : row_(row), col_(col), data_(row * col, 0.0) {}
+    : row_(row), col_(col), data_(row * col, 0.0), size_(row * col) {}
 
     /**
      * default constructor.
      *
      * creat an empty matrix object.
      */
-    Matrix() : row_(0), col_(0) {}
+    Matrix() : row_(0), col_(0), size_(0) {}
 
     /**
      * access/modify the matrix element by index without
@@ -124,6 +126,11 @@ class Matrix
     const size_t & col() const {return col_;}
 
     /**
+     * get matrix size, that is, how many elements the matrix has.
+     */
+    const size_t & size() const {return size_;}
+
+    /**
      * Make the matrix to be symmetric. The lower triangular
      * matrix data is used by default.
      *
@@ -159,13 +166,13 @@ class Matrix
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
      */
-    bool is_symmetric(double threshold = 1e-10)
+    bool is_symmetric(double threshold = 1e-10) const
     {
         threshold = std::fabs(threshold);
         if (row_ != col_) {
             return false;
         }
-        Matrix & T = *this;
+        const Matrix & T = *this;
         for (size_t i = 0; i < row_; i++) {
             for (size_t j = 0; j < i; j++) {
                 if (std::fabs(T(i, j) - T(j, i)) > threshold) {
@@ -183,13 +190,13 @@ class Matrix
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
      */
-    bool is_diagonal(double threshold = 1e-10)
+    bool is_diagonal(double threshold = 1e-10) const
     {
         threshold = std::fabs(threshold);
         if (row_ != col_) {
             return false;
         }
-        Matrix & T = *this;
+        const Matrix & T = *this;
         for (size_t i = 0; i < row_; i++) {
             for (size_t j = 0; j < i; j++) {
                 if (std::fabs(T(i, j)) > threshold || std::fabs(T(j, i)) > threshold) {
@@ -208,7 +215,7 @@ class Matrix
      * @ param [in] threshold the threshold of testing float number's equality.
      * @ return bool.
      */
-    bool is_identity(double threshold = 1e-10)
+    bool is_identity(double threshold = 1e-10) const
     {
         threshold = std::fabs(threshold);
         if (fabs(threshold) >= 1) {
@@ -217,7 +224,7 @@ class Matrix
         if (row_ != col_) {
             return false;
         }
-        Matrix & T = *this;
+        const Matrix & T = *this;
         for (size_t i = 0; i < row_; i++) {
             if (std::fabs(T(i, i) - 1.0) > threshold) {
                 return false;
@@ -270,6 +277,19 @@ class Matrix
                 (*this)(i, j) = dis(g_rand_generator_mt19937_seed_fixed);
             }
         }
+        return *this;
+    }
+
+    /**
+     * Scales current matrix by a constant. A = alpha * A.
+     *
+     * @ param[in] alpha the scalar coefficient.
+     * @ return *this the scaled matrix itself.
+     */
+    const Matrix & scale(const double alpha)
+    {
+        int size = size_;
+        blas::dscal_(&size, &alpha, data_.data(), blas::ione);
         return *this;
     }
 

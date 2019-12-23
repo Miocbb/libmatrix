@@ -2,33 +2,11 @@
 #include <matrix/matrix.h>
 #include <Eigen/Dense>
 #include <vector>
+#include "utils.h"
 
 using matrix::Matrix;
 using matrix::mult_dgemm;
 using Eigen::MatrixXd;
-
-static MatrixXd Matrix_to_mrixXd(Matrix & m)
-{
-    MatrixXd mxd(m.row(), m.col());
-    for (size_t i = 0; i < m.row(); i++) {
-        for (size_t j = 0; j < m.col(); j++) {
-            mxd(i, j) = m(i, j);
-        }
-    }
-    return mxd;
-}
-
-static void check_data_equality_with_EigenMatrix(MatrixXd & ref, Matrix & rst)
-{
-    ASSERT_EQ(ref.rows(), rst.row()) << "can not compare matrix: row dimension mismatch.";
-    ASSERT_EQ(ref.cols(), rst.col()) << "can not compare matrix: col dimension mismatch.";
-    for (size_t i = 0; i < rst.row(); i++) {
-        for (size_t j = 0; j < rst.col(); j++) {
-            EXPECT_EQ(ref(i, j), rst(i, j)) << "wrong element value at position ["
-                << i << "," << j << "].\n";
-        }
-    }
-}
 
 struct DgemmTest: public ::testing::Test {
     Matrix A22_gen_m;
