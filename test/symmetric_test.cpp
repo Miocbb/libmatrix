@@ -22,7 +22,7 @@ TEST(ToSymmetricTest, test)
         }
     }
     Matrix B = A;
-    A.symmetrize_lower_to_upper();
+    A.to_symmetric("L");
     for (size_t i = 0; i < row; i++) {
         for (size_t j = 0; j < i; j++) {
             EXPECT_DOUBLE_EQ(A(i, j), A(j, i)) << "Use lower part: not symmetric at position "
@@ -39,7 +39,7 @@ TEST(ToSymmetricTest, test)
         }
     }
     B = A;
-    A.symmetrize_upper_to_lower();
+    A.to_symmetric("U");
     for (size_t i = 0; i < row; i++) {
         for (size_t j = i; j < col; j++) {
             EXPECT_DOUBLE_EQ(A(i, j), A(j, i)) << "Use upper part: not symmetric at position "

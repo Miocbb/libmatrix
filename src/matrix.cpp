@@ -193,36 +193,27 @@ double Matrix::trace() const
 }
 
 /**
- * Make the matrix to be symmetric based on lower triangular part.
+ * Make the matrix to be symmetric.
  *
+ * @ param[in] uplo "U" using upper triangular part; "L" using lower triangular part.
  * @ return *this the symmetrized matrix itself.
  */
-Matrix & Matrix::symmetrize_lower_to_upper()
+Matrix & Matrix::to_symmetric(const string & uplo)
 {
     if (row_ != col_) {
         sig_err("Error: fail to symmetrize the matrix, which isn't square.");
     }
-    for (size_t i = 0; i < row_; i++) {
-        for (size_t j = 0; j < i; j++) {
-            (*this)(j, i) = (*this)(i, j);
+    if (uplo == "U") {
+        for (size_t i = 0; i < row_; i++) {
+            for (size_t j = 0; j < i; j++) {
+                (*this)(i, j) = (*this)(j, i);
+            }
         }
-    }
-    return *this;
-}
-
-/**
- * Make the matrix to be symmetric based on upper triangular part.
- *
- * @ return *this the symmetrized matrix itself.
- */
-Matrix & Matrix::symmetrize_upper_to_lower()
-{
-    if (row_ != col_) {
-        sig_err("Error: fail to symmetrize the matrix, which isn't square.");
-    }
-    for (size_t i = 0; i < row_; i++) {
-        for (size_t j = 0; j < i; j++) {
-            (*this)(i, j) = (*this)(j, i);
+    } else if (uplo == "L") {
+        for (size_t i = 0; i < row_; i++) {
+            for (size_t j = 0; j < i; j++) {
+                (*this)(j, i) = (*this)(i, j);
+            }
         }
     }
     return *this;

@@ -194,18 +194,12 @@ class Matrix
     double trace() const;
 
     /**
-     * Make the matrix to be symmetric based on lower triangular part.
+     * Make the matrix to be symmetric.
      *
+     * @ param[in] uplo "U" using upper triangular part; "L" using lower triangular part.
      * @ return *this the symmetrized matrix itself.
      */
-    Matrix & symmetrize_lower_to_upper();
-
-    /**
-     * Make the matrix to be symmetric based on upper triangular part.
-     *
-     * @ return *this the symmetrized matrix itself.
-     */
-    Matrix & symmetrize_upper_to_lower();
+    Matrix & to_symmetric(const string & uplo);
 
     /**
      * Make the matrix to be random with elements uniformly distributed in range [a, b).
