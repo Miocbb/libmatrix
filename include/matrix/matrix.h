@@ -13,3 +13,4 @@
 
 #include "../src/matrix.h"
 #include "../src/blas.h"
+#include "../src/lapack.h"

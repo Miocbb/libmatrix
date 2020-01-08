@@ -38,6 +38,17 @@ else()
     message(FATAL_ERROR "libblas not found")
 endif()
 
+# lapack library
+find_library(
+    LAPACK_LIBRARY
+    NAMES lapack
+    PATHS "/usr/lib")
+if (BLAS_LIBRARY)
+    message(STATUS "liblapack: ${LAPACK_LIBRARY}")
+else()
+    message(FATAL_ERROR "liblapack not found")
+endif()
+
 file(GLOB Headers
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
@@ -56,7 +67,8 @@ add_library(
 target_link_libraries(
     ${project_name}
     PUBLIC
-    ${BLAS_LIBRARY})
+    ${BLAS_LIBRARY}
+    ${LAPACK_LIBRARY})
 
 target_include_directories(
     ${project_name}

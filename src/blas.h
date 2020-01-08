@@ -7,7 +7,6 @@
 namespace matrix {
 
 using std::string;
-using matrix::Matrix;
 
 /**
  * wrapper of blas dgemm function for general matrix multiplication.
@@ -49,31 +48,7 @@ inline int mult_dscal(const double alpha, Matrix & A)
  * @ param[out] B the scaled matrix.
  * @ return int 0 for success others for failure.
  */
-inline int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B)
-{
-    if (A.row() != B.row() || A.col() != B.col()) {
-        sig_err("Error in matrix::mult_dscal_to(), matrix dimension mismatched.\n");
-    }
-    if (alpha == 1.0) {
-        B = A;
-        return 0;
-    } else if (alpha == 0.0) {
-#ifdef DOPENMP
-#pragma omp parallel for
-#endif
-        for (size_t i = 0; i < A.size(); i++) {
-            B.data()[i] = 0.0;
-        }
-    } else {
-#ifdef DOPENMP
-#pragma omp parallel for
-#endif
-        for (size_t i = 0; i < A.size(); i++) {
-            B.data()[i] = A.data()[i] * alpha;
-        }
-    }
-    return 0;
-}
+int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B);
 
 }
 
