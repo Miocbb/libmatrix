@@ -9,7 +9,7 @@ using matrix::diag_sym_matrix;
 /**
  * test symmetric matrix diagonalization function.
  */
-TEST(DsyevTest, dsyev_test)
+TEST(DiagonalizeSymmetricMatrixTest, dsyev_test)
 {
     /**
      * trivial case: diagonalize a diagonal matrix.

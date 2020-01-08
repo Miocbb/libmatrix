@@ -63,4 +63,62 @@ int diag_sym_matrix(const string & uplo, Matrix & A, vector<double> & eig)
     return 0;
 }
 
+/**
+ * set the input matrix be an random orthogonal matrix by using QR factorization
+ * with column pivoting.
+ *
+ * The lapack subroutine dgeqp3 is used.
+ *
+ * @ param[in, out] Q the input matrix. On exit, it stores a random orthogonal matrix.
+ * @ return int 0 refers to success.
+ */
+int set_matrix_random_orthogonal(Matrix & Q, bool using_fixed_seed)
+{
+    if (!Q.is_square()) {
+        sig_err("Error in set_matrix_random_orthogonal: matrix is not a square matrix.\n");
+    }
+
+    // first generate a random matrix.
+    if (using_fixed_seed) {
+        Q.randomize_seed_fixed(0, 1);
+    } else {
+        Q.randomize(0, 1);
+    }
+
+    // QR factorization to get Q matrix.
+    int n = Q.col();
+    int *jpvt = new int[n];
+    double *tau = new double[n];
+    double work_opt = 0;
+    int lwork = -1;
+    double *work = nullptr;
+    int info = 0;
+    // query work space.
+    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt, tau, &work_opt, &lwork, &info);
+    lwork = (int) work_opt;
+    work = new double[lwork];
+    // do qr factorization.
+    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt, tau, work, &lwork, &info);
+    if (info < 0) {
+        printf("Error in mtx_set_matrix_random_orthogonal:"
+               "QR factorization failed."
+               "The %d-th argument had an illegal value\n", -info);
+        std::exit(EXIT_FAILURE);
+    }
+    // retrieve Q matrix from dgeqp3
+    lapack::dorgqr_(&n, &n, &n, Q.data(), &n, tau, work, &lwork, &info);
+    if (info < 0) {
+        printf("Error in mtx_set_matrix_random_orthogonal:"
+               "Retrieve Q matrix failed."
+               "The %d-th argument had an illegal value\n", -info);
+        std::exit(EXIT_FAILURE);
+    }
+
+    delete [] jpvt;
+    delete [] tau;
+    delete [] work;
+
+    return 0;
+}
+
 }

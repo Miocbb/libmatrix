@@ -19,6 +19,20 @@ namespace matrix {
  */
 int diag_sym_matrix(const string & uplo, Matrix & A, vector<double> & eig);
 
+/**
+ * set the input matrix be an random orthogonal matrix by using QR factorization
+ * with column pivoting.
+ *
+ * The lapack subroutine dgeqp3 is used.
+ *
+ * @ param[in, out] Q the input matrix. On exit, it stores a random orthogonal matrix.
+ * @ param[in] using_fixed_seed if or not using the fixed seed to feed the random number
+ *  generator. If it is true, the function behavior can be repeatble at different running time,
+ *  otherwise, it will not.
+ * @ return int 0 refers to success.
+ */
+int set_matrix_random_orthogonal(Matrix & Q, bool using_fixed_seed = true);
+
 }
 
 #endif
