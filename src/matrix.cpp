@@ -127,7 +127,7 @@ bool Matrix::is_identity(double threshold) const
             return false;
         }
     }
-    if (! this->is_diagonal()) {
+    if (!this->is_diagonal(threshold)) {
         return false;
     }
     return true;
