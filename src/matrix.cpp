@@ -193,30 +193,37 @@ double Matrix::trace() const
 }
 
 /**
- * Make the matrix to be symmetric. The lower triangular
- * matrix data is used by default.
+ * Make the matrix to be symmetric based on lower triangular part.
  *
- * @ param use_lower if use the lowertriangular part to
- * symmetrize the matrix. Default it is true.
  * @ return *this the symmetrized matrix itself.
  */
-Matrix & Matrix::to_symmetric(bool use_lower)
+Matrix & Matrix::symmetrize_lower_to_upper()
 {
     if (row_ != col_) {
         sig_err("Error: fail to symmetrize the matrix, which isn't square.");
     }
-    if (use_lower) {
-        for (size_t i = 0; i < row_; i++) {
-            for (size_t j = 0; j < i; j++) {
-                (*this)(j, i) = (*this)(i, j);
-            }
+    for (size_t i = 0; i < row_; i++) {
+        for (size_t j = 0; j < i; j++) {
+            (*this)(j, i) = (*this)(i, j);
         }
-    } else {
-        for (size_t i = 0; i < row_; i++) {
-           for (size_t j = 0; j < i; j++) {
-               (*this)(i, j) = (*this)(j, i);
-           }
-       }
+    }
+    return *this;
+}
+
+/**
+ * Make the matrix to be symmetric based on upper triangular part.
+ *
+ * @ return *this the symmetrized matrix itself.
+ */
+Matrix & Matrix::symmetrize_upper_to_lower()
+{
+    if (row_ != col_) {
+        sig_err("Error: fail to symmetrize the matrix, which isn't square.");
+    }
+    for (size_t i = 0; i < row_; i++) {
+        for (size_t j = 0; j < i; j++) {
+            (*this)(i, j) = (*this)(j, i);
+        }
     }
     return *this;
 }

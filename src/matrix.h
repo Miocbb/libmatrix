@@ -194,14 +194,18 @@ class Matrix
     double trace() const;
 
     /**
-     * Make the matrix to be symmetric. The lower triangular
-     * matrix data is used by default.
+     * Make the matrix to be symmetric based on lower triangular part.
      *
-     * @ param use_lower if use the lowertriangular part to
-     * symmetrize the matrix. Default it is true.
      * @ return *this the symmetrized matrix itself.
      */
-    Matrix & to_symmetric(bool use_lower = true);
+    Matrix & symmetrize_lower_to_upper();
+
+    /**
+     * Make the matrix to be symmetric based on upper triangular part.
+     *
+     * @ return *this the symmetrized matrix itself.
+     */
+    Matrix & symmetrize_upper_to_lower();
 
     /**
      * Make the matrix to be random with elements uniformly distributed in range [a, b).

@@ -18,7 +18,7 @@ TEST(MatrixTypeCheckTest, is_symmetric_test)
     A.randomize(0, 1);
     EXPECT_FALSE(A.is_symmetric()); // random matrix usually is not symmetric.
     EXPECT_TRUE(A.is_symmetric(2)); // lower threshold to be symmetric.
-    A.to_symmetric();
+    A.symmetrize_lower_to_upper();
     EXPECT_TRUE(A.is_symmetric());  // real symmetric matrix.
     EXPECT_TRUE(A.is_symmetric(-1e-16)); // happended to set it to negative threshold.
 
