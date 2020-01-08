@@ -178,6 +178,21 @@ bool Matrix::is_equal_to(Matrix & A, double threshold) const
 }
 
 /**
+ * calculate matrix trace.
+ */
+double Matrix::trace() const
+{
+    if (!this->is_square()) {
+        sig_err("Error to get matrix trace: matrix is not square.");
+    }
+    double rst = 0.0;
+    for (size_t i = 0; i < row_; i++) {
+        rst += (*this)(i, i);
+    }
+    return rst;
+}
+
+/**
  * Make the matrix to be symmetric. The lower triangular
  * matrix data is used by default.
  *

@@ -189,6 +189,11 @@ class Matrix
     void show_lower() const;
 
     /**
+     * calculate matrix trace.
+     */
+    double trace() const;
+
+    /**
      * Make the matrix to be symmetric. The lower triangular
      * matrix data is used by default.
      *
