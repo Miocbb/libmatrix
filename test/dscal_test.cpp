@@ -34,7 +34,7 @@ TEST(MatrixScaleTest, method_scale_test)
     // scale = positive
     A.randomize(0, 1);
     A_copy2 = A_copy = A;
-    MatrixXd A_mxd = Matrix_to_mrixXd(A);
+    MatrixXd A_mxd = Matrix_to_MatrixXd(A);
     A_mxd *= 2.0;
     A.scale(2.0);
     mult_dscal(2.0, A_copy);

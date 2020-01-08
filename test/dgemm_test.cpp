@@ -40,11 +40,11 @@ struct DgemmTest: public ::testing::Test {
         A33_gen_m = Matrix(3, 3).randomize(0, 1);
         A100_m = Matrix(100, 100).randomize(0, 100);
 
-        A22_gen_mxd = Matrix_to_mrixXd(A22_gen_m);
-        A23_gen_mxd = Matrix_to_mrixXd(A23_gen_m);
-        A32_gen_mxd = Matrix_to_mrixXd(A32_gen_m);
-        A33_gen_mxd = Matrix_to_mrixXd(A33_gen_m);
-        A100_mxd = Matrix_to_mrixXd(A100_m);
+        A22_gen_mxd = Matrix_to_MatrixXd(A22_gen_m);
+        A23_gen_mxd = Matrix_to_MatrixXd(A23_gen_m);
+        A32_gen_mxd = Matrix_to_MatrixXd(A32_gen_m);
+        A33_gen_mxd = Matrix_to_MatrixXd(A33_gen_m);
+        A100_mxd = Matrix_to_MatrixXd(A100_m);
 
         C22_m = Matrix(2, 2);
         C23_m = Matrix(2, 3);
@@ -52,11 +52,11 @@ struct DgemmTest: public ::testing::Test {
         C33_m = Matrix(3, 3);
         C100_m = Matrix(100, 100);
 
-        C22_mxd = Matrix_to_mrixXd(C22_m);
-        C23_mxd = Matrix_to_mrixXd(C23_m);
-        C32_mxd = Matrix_to_mrixXd(C32_m);
-        C33_mxd = Matrix_to_mrixXd(C33_m);
-        C100_mxd = Matrix_to_mrixXd(C100_m);
+        C22_mxd = Matrix_to_MatrixXd(C22_m);
+        C23_mxd = Matrix_to_MatrixXd(C23_m);
+        C32_mxd = Matrix_to_MatrixXd(C32_m);
+        C33_mxd = Matrix_to_MatrixXd(C33_m);
+        C100_mxd = Matrix_to_MatrixXd(C100_m);
     }
 
     virtual void TearDown() override
