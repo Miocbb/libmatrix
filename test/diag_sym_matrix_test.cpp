@@ -4,7 +4,7 @@
 
 using matrix::Matrix;
 using std::vector;
-using matrix::eig_dsyev;
+using matrix::diag_sym_matrix;
 
 /**
  * test symmetric matrix diagonalization function.
@@ -27,7 +27,7 @@ TEST(DsyevTest, dsyev_test)
 
     // test upper triangular.
     A_eigvec = A;
-    eig_dsyev("U", A_eigvec, A_eigval);
+    diag_sym_matrix("U", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
@@ -35,7 +35,7 @@ TEST(DsyevTest, dsyev_test)
     EXPECT_TRUE(A_eigvec.is_identity());     // eigenvector matrix should be identity.
     // test lower triangular.
     A_eigvec = A;
-    eig_dsyev("L", A_eigvec, A_eigval);
+    diag_sym_matrix("L", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
@@ -49,13 +49,13 @@ TEST(DsyevTest, dsyev_test)
     A_diag = {0.0, 2.0};
     // test upper triangular.
     A_eigvec = A;
-    eig_dsyev("U", A_eigvec, A_eigval);
+    diag_sym_matrix("U", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
     // test lower triangular.
     A_eigvec = A;
-    eig_dsyev("L", A_eigvec, A_eigval);
+    diag_sym_matrix("L", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
@@ -69,7 +69,7 @@ TEST(DsyevTest, dsyev_test)
     A_diag = {0.0, 2.0};
     // test upper triangular.
     A_eigvec = A;
-    eig_dsyev("L", A_eigvec, A_eigval);
+    diag_sym_matrix("L", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
@@ -83,7 +83,7 @@ TEST(DsyevTest, dsyev_test)
     A_diag = {0.0, 2.0};
     // test upper triangular.
     A_eigvec = A;
-    eig_dsyev("U", A_eigvec, A_eigval);
+    diag_sym_matrix("U", A_eigvec, A_eigval);
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }

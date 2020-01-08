@@ -17,7 +17,7 @@ namespace matrix {
  *  the orthonormal eigenvalues of the matrix A when succeed.
  * @ param [out] the eigenvalues in ascending order when succeed.
  */
-int eig_dsyev(const string & uplo, Matrix & A, vector<double> & eig);
+int diag_sym_matrix(const string & uplo, Matrix & A, vector<double> & eig);
 
 }
 
