@@ -230,6 +230,14 @@ class Matrix
      */
     Matrix & scale(const double alpha);
 
+    /**
+     * fill all elements with input number.
+     *
+     * @ param[in] a the number to be filled.
+     * @ return *this the matrix itself.
+     */
+    Matrix & fill_all(double a);
+
 };
 
 }

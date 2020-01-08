@@ -263,4 +263,20 @@ Matrix & Matrix::scale(const double alpha)
     return *this;
 }
 
+/**
+ * fill all elements with input number.
+ *
+ * @ param[in] a the number to be filled.
+ * @ return *this the matrix itself.
+ */
+Matrix & Matrix::fill_all(double a)
+{
+    #ifdef DOPENMP
+    #pragma omp parallel for
+    #endif
+    for (size_t i = 0; i < size_; i++) {
+        data_[i] = a;
+    }
+}
+
 }
