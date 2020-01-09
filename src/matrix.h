@@ -20,6 +20,10 @@ using std::vector;
 using std::size_t;
 using std::string;
 
+/**
+ * Helper class used to do comma initialization for matrix object like Eigen library.
+ */
+class MatrixCommaInitializer;
 
 class Matrix
 {
@@ -64,6 +68,14 @@ class Matrix
      * creat an empty matrix object.
      */
     Matrix() : row_(0), col_(0), size_(0) {}
+
+    /**
+     * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
+     * That is, `A << 1, 2, 3, 4;`. The matrix dimension of A has to be specified
+     * in advance and the number of elements has to be equal to the matrix size,
+     * otherwise, it will abort with error.
+     */
+    MatrixCommaInitializer operator <<(double a);
 
     /**
      * access/modify the matrix element by index without

@@ -39,3 +39,26 @@ TEST(MatrixConstructorTest, initialization_test)
         EXPECT_EQ(C.data()[i], data[i]);
     }
 }
+
+TEST(MatrixConstructorTest, comma_initializer)
+{
+    // matrix A: 1x1.
+    Matrix A(1, 1);
+    A << 1;
+    EXPECT_EQ(A(0,0), 1);
+
+    // matrix B: 2x2;
+    Matrix A22(2, 2);
+    A22 << 1, 2,
+           3, 4;
+    for (size_t i = 0; i < 4; i++) {
+        EXPECT_EQ(A22.data()[i], i+1);
+    }
+
+    //Matrix A00; // run with error
+    //A00 << 1;
+
+    //A22 << 1, 2, 3, 4, 5; // run with error.
+
+    //A22 << 1, 2, 3; // run with error.
+}

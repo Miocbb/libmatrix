@@ -4,12 +4,24 @@
 
 #include "matrix.h"
 #include "blas_base.h"
+#include "comma_initialize.h"
 #include <random>
 #include <cmath>
 
 namespace matrix {
 
 static std::mt19937 g_rand_generator_mt19937_seed_fixed(1);
+
+/**
+ * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
+ * That is, `A << 1, 2, 3, 4;`. The matrix dimension of A has to be specified
+ * in advance and the number of elements has to be equal to the matrix size,
+ * otherwise, it will abort with error.
+ */
+MatrixCommaInitializer Matrix::operator <<(double a)
+{
+    return MatrixCommaInitializer(*this, a);
+}
 
 /**
  * print out the full matrix.
