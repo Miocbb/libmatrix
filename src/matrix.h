@@ -44,6 +44,21 @@ class Matrix
     : row_(row), col_(col), data_(row * col, 0.0), size_(row * col) {}
 
     /**
+     * construct a matrix from a std::vector<double>.
+     *
+     * @ param[in] data the input matrix data. It will be assigned the matrix object.
+     */
+    Matrix(size_t row, size_t col, vector<double> & data)
+    : row_(row), col_(col), size_(row * col)
+    {
+        if (size_ != data.size()) {
+            std::cout << "Error in creating a matrix from a vector object: unmatched size.";
+            std::exit(EXIT_FAILURE);
+        }
+        data_ = data;
+    }
+
+    /**
      * default constructor.
      *
      * creat an empty matrix object.

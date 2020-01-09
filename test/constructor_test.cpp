@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include <matrix/matrix.h>
+#include <vector>
 
 using matrix::Matrix;
+using std::vector;
 
 /**
  * Test the only one constructor, which should construct a zero matrix.
@@ -29,4 +31,11 @@ TEST(MatrixConstructorTest, initialization_test)
     EXPECT_TRUE(B.is_square());
     EXPECT_EQ(0, B.row());
     EXPECT_EQ(0, B.col());
+
+    // create a matrix from a vector.
+    vector<double> data = {1, 2, 3, 4};
+    Matrix C(2, 2, data);
+    for (size_t i = 0; i < 4; i++) {
+        EXPECT_EQ(C.data()[i], data[i]);
+    }
 }
