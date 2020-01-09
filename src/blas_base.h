@@ -29,6 +29,7 @@ extern "C" void dsyev_(const char * jobz, const char *uplo,
 
 extern "C" void dscal_(const int *N, const double *alpha, double *a,
                        const int *lda);
+extern "C" void dcopy_(const int *N, const double *x, const int *incx, double *y, const int *incy);
 }
 
 }

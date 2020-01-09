@@ -3,11 +3,12 @@
 #include <vector>
 
 using matrix::Matrix;
+using std::vector;
 
 /**
  * Test is_symmetric() method.
  */
-TEST(MatrixTypeCheckTest, is_symmetric_test)
+TEST(MatrixCheckerTest, is_symmetric_test)
 {
     Matrix A(10, 10);
     // zero matrix should be regarded as symmetric.
@@ -38,7 +39,7 @@ TEST(MatrixTypeCheckTest, is_symmetric_test)
 /**
  * Test is_diagonal() method.
  */
-TEST(MatrixTypeCheckTest, is_diagonal_test)
+TEST(MatrixCheckerTest, is_diagonal_test)
 {
     Matrix A(10, 10);
     // zero matrix should be regarded as diagonal.
@@ -76,7 +77,7 @@ TEST(MatrixTypeCheckTest, is_diagonal_test)
 /**
  * Test is_identity() method.
  */
-TEST(MatrixTypeCheckTest, is_identity_test)
+TEST(MatrixCheckerTest, is_identity_test)
 {
     Matrix A(10, 10);
     // zero matrix should be not regarded as diagonal.
@@ -121,7 +122,7 @@ TEST(MatrixTypeCheckTest, is_identity_test)
 /**
  * Test is_zeros() method.
  */
-TEST(MatrixTypeCheckTest, is_zeros_test)
+TEST(MatrixCheckerTest, is_zeros_test)
 {
     Matrix A(10, 8);
     // real zero matrix
@@ -144,7 +145,7 @@ TEST(MatrixTypeCheckTest, is_zeros_test)
 /**
  * Test is_equal_to() method.
  */
-TEST(MatrixTypeCheckTest, is_equal_to_test)
+TEST(MatrixCheckerTest, is_equal_to_test)
 {
     Matrix A(10, 8);
     Matrix B(10, 8);
@@ -163,4 +164,21 @@ TEST(MatrixTypeCheckTest, is_equal_to_test)
     A.randomize(0, 1);
     B.randomize(0, 1);
     EXPECT_FALSE(A.is_equal_to(B));
+}
+
+TEST(MatrixCheckerTest, is_data_stored_outside)
+{
+    vector<double> data = {1, 2, 3, 4};
+    // special case, empty matrix should reported with false.
+    Matrix A;
+    EXPECT_FALSE(A.is_data_stored_outside());
+    Matrix B(0, 0);
+    EXPECT_FALSE(B.is_data_stored_outside());
+
+    Matrix C(2, 2, data, matrix::Matrix::CopyType::kShallowCopy);
+    EXPECT_TRUE(C.is_data_stored_outside());
+    Matrix D(2, 2, data, matrix::Matrix::CopyType::kDeepCopy);
+    EXPECT_FALSE(D.is_data_stored_outside());
+    Matrix E(2, 2);
+    EXPECT_FALSE(E.is_data_stored_outside());
 }

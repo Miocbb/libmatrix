@@ -34,7 +34,7 @@ void Matrix::show_full() const
     for (size_t i = 0; i < row_; i++) {
         printf(" %5zu:\n", i + 1);
         for (int j = 1; j <= col_; j++) {
-            printf(" %15.8e,", data_[k]);
+            printf(" %15.8e,", this->data()[k]);
             if (j % numCol == 0 && j != col_) {
                 printf("\n");
             }
@@ -56,7 +56,7 @@ void Matrix::show_lower() const
         printf(" %5zu:\n", i + 1);
         for (int j = 0; j <= i; j++) {
             int ij = i * col_ + j;
-            printf(" %15.8e,", data_[ij]);
+            printf(" %15.8e,", this->data()[ij]);
             if ((j + 1) % numCol == 0 && j != i) {
                 printf("\n");
             }
@@ -182,7 +182,7 @@ bool Matrix::is_equal_to(Matrix & A, double threshold) const
         return false;
     }
     for (size_t i = 0; i < size_; i++) {
-        if (std::fabs(data_[i] - A.data()[i]) > threshold) {
+        if (std::fabs(this->data()[i] - A.data()[i]) > threshold) {
             return false;
         }
     }
@@ -284,7 +284,7 @@ Matrix & Matrix::randomize_seed_fixed(double a, double b)
 Matrix & Matrix::scale(const double alpha)
 {
     int size = size_;
-    blas::dscal_(&size, &alpha, data_.data(), blas::ione);
+    blas::dscal_(&size, &alpha, this->data(), blas::ione);
     return *this;
 }
 
@@ -300,7 +300,7 @@ Matrix & Matrix::fill_all(double a)
     #pragma omp parallel for
     #endif
     for (size_t i = 0; i < size_; i++) {
-        data_[i] = a;
+        this->data()[i] = a;
     }
 }
 

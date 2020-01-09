@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include "io.h"
+#include "blas_base.h"
 
 
 namespace matrix {
@@ -31,35 +32,104 @@ class Matrix
     size_t row_;
     size_t col_;
     size_t size_;
-    vector<double> data_;
+    /* The data of matrix is either stored in vector `data_` or outside of the
+     * object that is pointed by the double pointer `data_ptr_`. */
+    vector<double> data_vec_;
+    double * data_ptr_;     /* This pointer will always point to the head of the matrix data.
+                             * No memory allocation is assigned for this pointer. */
 
     public:
+
+    enum CopyType {
+        kShallowCopy,
+        kDeepCopy,
+    };
+
     /**
-     * constructor.
+     * construct a matrix with given size.
      *
      * the memory for a matrix with input size will
      * be allocated and initialize all matrix elements
      * to be zero.
      *
+     * matrix data is stored in inside of this object.
+     *
      * @ param row row number of matrix
      * @ param col column number of matrix
      */
     Matrix(size_t row, size_t col)
-    : row_(row), col_(col), data_(row * col, 0.0), size_(row * col) {}
+    : row_(row), col_(col), data_vec_(row * col, 0.0), size_(row * col),
+    data_ptr_{data_vec_.data()} {}
 
     /**
      * construct a matrix from a std::vector<double>.
      *
-     * @ param[in] data the input matrix data. It will be assigned the matrix object.
+     * The data size of the vector will be check to match the matrix size.
+     *
+     * This constructor is not const friendly. If you want to do a shallow copy
+     * of a const vector to the matrix, you can do declare the created Matrix to
+     * be const and typecast the const vector to be non-const vector, that is,
+     * ```
+     * const vector<double> data;
+     * const Matrix A(row, col, const_cast <vector<double>>(data), kShallowCopy);
+     * ```
+     * This can preserve the created matrix not change the original vector data.
+     *
+     * @ param[in] data: the input matrix data.
+     * @ param[in] copy_type: If copy_type is deep copy, all the data
+     *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
+     *  data memory is assigned to the matrix and the matrix gains the access to the data.
      */
-    Matrix(size_t row, size_t col, vector<double> & data)
-    : row_(row), col_(col), size_(row * col)
+    Matrix(size_t row, size_t col, vector<double> & inp_data, CopyType copy_type)
+    : row_(row), col_(col), size_(row * col), data_vec_(0)
     {
-        if (size_ != data.size()) {
+        if (size_ != inp_data.size()) {
             std::cout << "Error in creating a matrix from a vector object: unmatched size.";
             std::exit(EXIT_FAILURE);
         }
-        data_ = data;
+        if (copy_type == kDeepCopy) {
+            data_vec_ = inp_data;
+            data_ptr_ = data_vec_.data();
+        } else if (copy_type == kShallowCopy) {
+            data_ptr_ = inp_data.data();
+        } else {
+            sig_err("Error in Matrix constructor: unknown copy type.");
+        }
+    }
+
+    /**
+     * construct a matrix from a double array pointer.
+     *
+     * The data size of the array will NOT be check to match the matrix size.
+     * Use this constructor carefully.
+     *
+     * This constructor is not const friendly. If you want to do a shallow copy
+     * of a const double array to the matrix, you can do declare the created Matrix to
+     * be const and typecast the const array to be non-const array, that is,
+     * ```
+     * const double * data;
+     * const Matrix A(row, col, const_cast <double *>(data), kShallowCopy);
+     * ```
+     * This can preserve the created matrix not change the original array data.
+     *
+     * @ param[in] data: the input matrix data.
+     * @ param[in] copy_type: If copy_type is deep copy, all the data
+     *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
+     *  data memory is assigned to the matrix and the matrix gains the access to the data.
+     */
+    Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type)
+    : row_(row), col_(col), size_(row * col), data_vec_(0)
+    {
+        if (copy_type == kDeepCopy) {
+            data_vec_.resize(size_);
+            data_ptr_ = data_vec_.data();
+            int dim = size_;
+            blas::dcopy_(&dim, inp_data_ptr, blas::ione, data_ptr_, blas::ione);
+        } else if (copy_type == kShallowCopy) {
+            data_ptr_ = inp_data_ptr;
+        } else {
+            sig_err("Error in Matrix constructor: unknown copy type.");
+        }
     }
 
     /**
@@ -67,7 +137,36 @@ class Matrix
      *
      * creat an empty matrix object.
      */
-    Matrix() : row_(0), col_(0), size_(0) {}
+    Matrix() : row_(0), col_(0), size_(0), data_vec_(0), data_ptr_{nullptr} {}
+
+    /**
+     * Copy constructor.
+     *
+     * Always do a deep copy.
+     */
+    Matrix(const Matrix & other) : row_{other.row()}, col_{other.col()}, size_{other.size()},
+    data_vec_(size_), data_ptr_{data_vec_.data()}
+    {
+        int dim = size_;
+        blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
+    }
+
+    /**
+     * Copy assignment operator overloading.
+     *
+     * Always make a deep copy of the matrix and assign it to the destination.
+     */
+    Matrix & operator = (const Matrix & other)
+    {
+        row_ = other.row();
+        col_ = other.col();
+        size_ = other.size();
+        data_vec_.resize(size_);
+        data_ptr_ = data_vec_.data();
+        int dim = size_;
+        blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
+        return *this;
+    }
 
     /**
      * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
@@ -85,7 +184,7 @@ class Matrix
      * @ param j the column index of the element
      * @ return referent to the matrix element.
      */
-    double & operator()(size_t i, size_t j) {return data_[i * col_ + j];};
+    double & operator()(size_t i, size_t j) {return data_ptr_[i * col_ + j];};
 
     /**
      * access the matrix element by index without bound check.
@@ -94,7 +193,7 @@ class Matrix
      * @ param j the column index of the element
      * @ return const referent to the element value.
      */
-    const double & operator()(size_t i, size_t j) const {return data_[i * col_ + j];};
+    const double & operator()(size_t i, size_t j) const {return data_ptr_[i * col_ + j];};
 
     /**
      * access/modify the matrix element by index with bound check.
@@ -130,13 +229,13 @@ class Matrix
      * get the pointer that points to the begining of
      * matrix data.
      */
-    double * data() {return data_.data();}
+    double * data() {return data_ptr_;}
 
     /**
      * get the const pointer that points to the begining of
      * matrix data.
      */
-    const double * data() const {return data_.data();}
+    const double * data() const {return data_ptr_;}
 
     /**
      * get matrix row numbers.
@@ -152,6 +251,21 @@ class Matrix
      * get matrix size, that is, how many elements the matrix has.
      */
     const size_t & size() const {return size_;}
+
+    /**
+     * check if the data is stored in vector or outside of the object.
+     *
+     * special case:
+     * if the matrix is an empty matrix, it will return false.
+     */
+    bool is_data_stored_outside() const
+    {
+        if (this->size() == 0) {
+            return false;
+        } else {
+            return data_ptr_ != data_vec_.data();
+        }
+    }
 
     /**
      * check if the matrix is square or not.
