@@ -59,6 +59,20 @@ file(GLOB Sources
 
 add_subdirectory(googletest)
 
+# enable openmp or not.
+if (OPENMP)
+    message(STATUS "trying to use openmp.")
+    add_compile_definitions(USE_OPENMP)
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        message(STATUS "openmp for CXX is found and enabled.")
+    else()
+        message(WARNING "Fail to find openmp for CXX. Will compile WITHOUT openmp for CXX.")
+    endif()
+else()
+    message(STATUS "openmp for CXX is not used. If you want to enable openmp, use `cmake -DOPENMP=on`.")
+endif()
+
 add_library(
     ${project_name} SHARED
     ${Sources}
@@ -69,6 +83,15 @@ target_link_libraries(
     PUBLIC
     ${BLAS_LIBRARY}
     ${LAPACK_LIBRARY})
+
+if (OPENMP)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(
+            ${project_name}
+            PUBLIC
+            OpenMP::OpenMP_CXX)
+    endif()
+endif()
 
 target_include_directories(
     ${project_name}

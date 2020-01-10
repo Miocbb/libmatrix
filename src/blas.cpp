@@ -201,14 +201,14 @@ int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B)
         B = A;
         return 0;
     } else if (alpha == 0.0) {
-#ifdef DOPENMP
+#ifdef USE_OPENMP
 #pragma omp parallel for
 #endif
         for (size_t i = 0; i < A.size(); i++) {
             B.data()[i] = 0.0;
         }
     } else {
-#ifdef DOPENMP
+#ifdef USE_OPENMP
 #pragma omp parallel for
 #endif
         for (size_t i = 0; i < A.size(); i++) {

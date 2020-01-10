@@ -296,7 +296,7 @@ Matrix & Matrix::scale(const double alpha)
  */
 Matrix & Matrix::fill_all(double a)
 {
-    #ifdef DOPENMP
+    #ifdef USE_OPENMP
     #pragma omp parallel for
     #endif
     for (size_t i = 0; i < size_; i++) {
