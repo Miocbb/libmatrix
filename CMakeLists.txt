@@ -57,7 +57,13 @@ file(GLOB Sources
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 
-add_subdirectory(googletest)
+#if(IS_DIRECTORY $ENV{HOME}/local/googletest)
+#    message(STATUS "found googletest source folder.")
+#    add_subdirectory($ENV{HOME}/local/googletest $ENV{HOME}/local/googletest/build)
+#else()
+#    message(FATAL_ERROR "googletest source folder not found.
+#        Run `git clone https://github.com/google/googletest.git` under path `$ENV{HOME}/local/`")
+#endif()
 
 # enable openmp or not.
 if (OPENMP)
