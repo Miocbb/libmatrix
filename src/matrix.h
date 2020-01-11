@@ -317,7 +317,15 @@ class Matrix
      * @ param A the compared matrix.
      * @ return bool
      */
-    bool is_equal_to(Matrix & A, double threshold = 1e-10) const;
+    bool is_equal_to(const Matrix & A, double threshold = 1e-10) const;
+
+    /**
+     * check if two matrix has the same dimension.
+     *
+     * @ param[in] other: the other matrix.
+     * @ return bool.
+     */
+    bool is_same_dimension_to(const Matrix &other) const;
 
     /**
      * print out the full matrix.

@@ -175,7 +175,7 @@ bool Matrix::is_zeros(double threshold) const
  * @ param A the compared matrix.
  * @ return bool
  */
-bool Matrix::is_equal_to(Matrix & A, double threshold) const
+bool Matrix::is_equal_to(const Matrix &A, double threshold) const
 {
     threshold = std::fabs(threshold);
     if (size_ != A.size() || row_ != A.row() || col_ != A.col()) {
@@ -188,6 +188,18 @@ bool Matrix::is_equal_to(Matrix & A, double threshold) const
     }
     return true;
 }
+
+/**
+ * check if two matrix has the same dimension.
+ *
+ * @ param[in] other: the other matrix.
+ * @ return bool.
+ */
+bool Matrix::is_same_dimension_to(const Matrix &other) const
+{
+    return ((this->row() == other.row()) && (this->col() == other.col()));
+}
+
 
 /**
  * calculate matrix trace.
