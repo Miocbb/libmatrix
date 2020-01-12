@@ -158,6 +158,9 @@ class Matrix
      */
     Matrix & operator = (const Matrix & other)
     {
+        if (&other == this) {
+            return *this;
+        }
         row_ = other.row();
         col_ = other.col();
         size_ = other.size();
@@ -389,6 +392,11 @@ class Matrix
      * @ return *this the matrix itself.
      */
     Matrix & fill_all(double a);
+
+    /**
+     * set matrix to be identity.
+     */
+    Matrix & set_identity();
 
 };
 

@@ -316,4 +316,22 @@ Matrix & Matrix::fill_all(double a)
     }
 }
 
+/**
+ * set matrix to be identity.
+ */
+Matrix & Matrix::set_identity()
+{
+    if (!this->is_square()) {
+        sig_err("Error: cannot make a non-square matrix to be identity.\n");
+    }
+    this->fill_all(0.0);
+    #ifdef USE_OPENMP
+    #pragma omp parallel for
+    #endif
+    for (size_t i = 0; i < row_; i++) {
+        (*this)(i, i) = 1.0;
+    }
+}
+
+
 }

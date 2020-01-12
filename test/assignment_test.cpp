@@ -28,4 +28,7 @@ TEST(CopyAssignmentTest, test)
     EXPECT_FALSE(B.is_equal_to(A));
     EXPECT_FALSE(C.is_equal_to(A));
     EXPECT_FALSE(C.is_equal_to(B));
+
+    C = C;
+    EXPECT_TRUE(C.is_equal_to(C));
 }
