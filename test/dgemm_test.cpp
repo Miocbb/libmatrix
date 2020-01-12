@@ -216,3 +216,12 @@ TEST_F(DgemmTest, TxT_test)
     C100_mxd = A100_mxd.transpose() * A100_mxd.transpose();
     check_data_equality_with_EigenMatrix(C100_mxd, C100_m);
 }
+
+TEST_F(DgemmTest, ABAT_test)
+{
+    // A22 x A22 x A22.T
+    Matrix C(2, 2);
+    mult_dgemm_ABAT(A22_gen_m, A22_gen_m, C);
+    C22_mxd = A22_gen_mxd * A22_gen_mxd * A22_gen_mxd.transpose();
+    check_data_equality_with_EigenMatrix(C22_mxd, C);
+}

@@ -28,6 +28,11 @@ int mult_dgemm(const double alpha, const Matrix & A, const string & op_A,
                Matrix & C);
 
 /**
+ * calculate C = A * B * A^T.
+ */
+int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C);
+
+/**
  * wrapper of blas dscal function to scale matrix by a constant.
  *
  * @ param[in] alpha the scalar coefficient.

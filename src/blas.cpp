@@ -171,6 +171,9 @@ int mult_dgemm(const double alpha, const Matrix & A, const string & op_A,
                const Matrix & B, const string & op_B, const double beta,
                Matrix & C)
 {
+    if (&C == &A || &C == &B) {
+        sig_err("Error in matrix::mult_dgemm(): output matrix is one of the input matrix.");
+    }
     if (op_A == "N" && op_B == "N") {
         return mult_dgemm_NN(alpha, A, B, beta, C);
     } else if (op_A == "N" && op_B == "T") {
@@ -182,6 +185,19 @@ int mult_dgemm(const double alpha, const Matrix & A, const string & op_A,
     } else {
         sig_err("Error in matrix::mult_dgemm(): unknow operation on matrix\n");
     }
+}
+
+/**
+ * calculate C = A * B * A^T.
+ */
+int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C)
+{
+    if (&C == &A || &C == &B) {
+        sig_err("Error in matrix::mult_dgemm_ABAT(): output matrix is one of the input matrix.");
+    }
+    Matrix AB(A.row(), B.col());
+    mult_dgemm(1.0, A, "N", B, "N", 0.0, AB);
+    mult_dgemm(1.0, AB, "N", A, "T", 0.0, C);
 }
 
 /**
