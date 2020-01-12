@@ -16,6 +16,9 @@ static int ione[] = {1};
 static double dzero[] = {0.0};
 static double done[] = {1.0};
 
+extern "C" void drot_(const int *N, double *x, const int *incx, double *y, const int *incy,
+                      const double *c, const double *s);
+
 extern "C" void dgemm_(const char *transa, const char *transb,
                        const int *m, const int *n, const int *k,
                        const double *alpha,
