@@ -187,7 +187,11 @@ class Matrix
      * @ param j the column index of the element
      * @ return referent to the matrix element.
      */
-    double & operator()(size_t i, size_t j) {return data_ptr_[i * col_ + j];};
+    double & operator()(size_t i, size_t j) {
+        return const_cast<double &>(
+            static_cast<const Matrix &>(*this)(i, j)
+        );
+    };
 
     /**
      * access the matrix element by index without bound check.
@@ -207,10 +211,9 @@ class Matrix
      */
     double & at(size_t i, size_t j)
     {
-        if (i >= row_ || j >= col_) {
-            sig_err("Error: matrix index is out of bound.\n");
-        }
-        return (*this)(i, j);
+        return const_cast<double &>(
+            static_cast<const Matrix &>(*this).at(i, j)
+        );
     }
 
     /**
