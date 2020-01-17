@@ -5,7 +5,7 @@
 using matrix::Matrix;
 using std::vector;
 
-TEST(CopyAssignmentTest, test)
+TEST(CopyAssignmentTest, assignment_with_matrix)
 {
     vector<double> data = {1, 2, 3, 4};
     Matrix A(2, 2, data, matrix::Matrix::CopyType::kDeepCopy);
@@ -31,4 +31,14 @@ TEST(CopyAssignmentTest, test)
 
     C = C;
     EXPECT_TRUE(C.is_equal_to(C));
+}
+
+TEST(CopyAssignmentTest, assignment_with_initializer_list)
+{
+    Matrix A(2, 2);
+    A = {1, 2,
+         3, 4};
+    Matrix B(2, 2);
+    B << 1, 2, 3, 4;
+    EXPECT_TRUE(B.is_equal_to(A));
 }

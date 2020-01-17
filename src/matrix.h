@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <string>
 #include <iostream>
+#include <initializer_list>
 #include "io.h"
 #include "blas_base.h"
 
@@ -169,6 +170,34 @@ class Matrix
         int dim = size_;
         blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
         return *this;
+    }
+
+    /**
+     * Copy assignment operator overloading: enable an easy way to do matrix
+     * element initialization with std::initializer_list.
+     *
+     * The matrix dimension has to be declared in advance. The input list size
+     * will be checked for the initialization.
+     * e.g.
+     * Matrix A(2, 2);
+     * A = {1, 2,
+     *      3, 4};
+     *
+     * @ param[in] init_list: the data contained in the initializer_list.
+     * @ return: the const reference to the matrix itself.
+     */
+    const Matrix & operator = (std::initializer_list<double> init_list)
+    {
+        if (init_list.size() != this->size()) {
+            std::cout << "Error to initialize the matrix with initializer_list syntax. "
+                << "Unmatched size." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        size_t i = 0;
+        for (auto p = init_list.begin(); p != init_list.end(); p++) {
+            this->data()[i] = *p;
+            i++;
+        }
     }
 
     /**
