@@ -15,4 +15,6 @@
 #include "../src/matrix_io.h"
 #include "../src/comma_initialize.h"
 #include "../src/blas.h"
+#include "../src/blas_base.h"
 #include "../src/lapack.h"
+#include "../src/lapack_base.h"
