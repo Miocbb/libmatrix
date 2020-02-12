@@ -20,7 +20,6 @@ inline void sig_err(char *msg)
     std::cout << msg << "\n";
     std::exit(EXIT_FAILURE);
 }
-
 }
 
 #endif

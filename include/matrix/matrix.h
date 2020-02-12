@@ -12,6 +12,7 @@
 
 
 #include "../src/matrix.h"
+#include "../src/matrix_io.h"
 #include "../src/comma_initialize.h"
 #include "../src/blas.h"
 #include "../src/lapack.h"
