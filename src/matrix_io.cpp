@@ -59,4 +59,40 @@ void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char 
     fclose(f);
 }
 
+/**
+ * read matrix from binary file and create a vector of matrix.
+ */
+std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(const char *fname)
+{
+    assert(fname);
+    if(access(fname, R_OK) != 0 ) {
+        printf("Error in mtx_read_matrices(): file \"%s\" either does not exist"
+               " or has no reading access.\n", fname);
+        std::exit(EXIT_FAILURE);
+    }
+    std::vector<std::shared_ptr<Matrix>> rst;
+    FILE *f = fopen(fname, "rb");
+    while (!feof(f)) {
+        size_t read_row = 0;
+        size_t read_col = 0;
+        fread(&read_row, sizeof(read_row), 1, f);
+        fread(&read_col, sizeof(read_col), 1, f);
+
+        auto mat = std::make_shared<Matrix>(read_row, read_col);
+        fread(mat->data(), sizeof (double), read_row * read_col, f);
+        rst.push_back(mat);
+    }
+    fclose(f);
+
+    return rst;
+}
+
+/**
+ * read matrix from binary file and create a vector of matrix.
+ */
+std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(string &fname)
+{
+    return read_matrices_from_binary(fname.c_str());
+}
+
 }

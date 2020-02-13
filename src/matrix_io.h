@@ -16,6 +16,11 @@ void write_matrices_to_binary(vector<std::shared_ptr<const Matrix>> &Mat, const 
  */
 void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char *fname);
 
+/**
+ * read matrix from binary file and create a vector of matrix.
+ */
+std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(const char *fname);
+std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(string &fname);
 }
 
 #endif  // _MATRIX_MATRIX_IO_H_
