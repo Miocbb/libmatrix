@@ -2,6 +2,8 @@
 #include "matrix.h"
 #include <unistd.h>
 #include <assert.h>
+#include <sstream>
+#include "exception.h"
 
 namespace matrix {
 /**
@@ -10,13 +12,10 @@ namespace matrix {
 void write_matrices_to_binary(vector<std::shared_ptr<const Matrix>> &Mat, const char *fname)
 {
     if (fname == NULL) {
-        printf("Error in mtx_write_matrices(): file name is not given!\n");
-        std::exit(EXIT_FAILURE);
+        throw exception::MatrixIOException(fname, "No file name.");
     } else if(access(fname, F_OK) == 0) {
         if(access(fname, W_OK) != 0 ) {
-            printf("Error in mtx_write_matrices(): file \"%s\" "
-                   "has no writing access.\n", fname);
-            std::exit(EXIT_FAILURE);
+            throw exception::MatrixIOException(fname, "No wrting access.");
         }
     }
 
@@ -36,11 +35,10 @@ void write_matrices_to_binary(vector<std::shared_ptr<const Matrix>> &Mat, const 
  */
 void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char *fname)
 {
-    assert(fname);
-    if(access(fname, R_OK) != 0 ) {
-        printf("Error in mtx_read_matrices(): file \"%s\" either does not exist"
-               " or has no reading access.\n", fname);
-        std::exit(EXIT_FAILURE);
+    if (fname == NULL) {
+        throw exception::MatrixIOException(fname, "No file name.");
+    } else if(access(fname, R_OK) != 0 ) {
+        throw exception::MatrixIOException(fname, "No readding access.");
     }
 
     FILE *f = fopen(fname, "rb");
@@ -50,9 +48,10 @@ void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char 
         fread(&read_row, sizeof(read_row), 1, f);
         fread(&read_col, sizeof(read_col), 1, f);
         if (read_row != Mat[i]->row() || read_col != Mat[i]->col()) {
-            printf("Error in read %zu-th matrix from binary file \"%s\":"
-                   "matrix dimensions do not match!", i, fname);
-            std::exit(EXIT_FAILURE);
+            std::stringstream msg;
+            msg << "Error in read " << i << "-th matrix from binary file" << fname
+                << ". Dimension is not matched.";
+            throw exception::MatrixIOException(fname, msg.str());
         }
         fread(Mat[i]->data(), sizeof (double), read_row * read_col, f);
     }
@@ -64,12 +63,12 @@ void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char 
  */
 std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(const char *fname)
 {
-    assert(fname);
-    if(access(fname, R_OK) != 0 ) {
-        printf("Error in mtx_read_matrices(): file \"%s\" either does not exist"
-               " or has no reading access.\n", fname);
-        std::exit(EXIT_FAILURE);
+    if (fname == NULL) {
+        throw exception::MatrixIOException(fname, "No file name.");
+    } else if(access(fname, R_OK) != 0 ) {
+        throw exception::MatrixIOException(fname, "No readding access.");
     }
+
     std::vector<std::shared_ptr<Matrix>> rst;
     FILE *f = fopen(fname, "rb");
     while (!feof(f)) {

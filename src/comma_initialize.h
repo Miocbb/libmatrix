@@ -2,6 +2,8 @@
 #define _MATRIX_COMMA_INITIALIZE_H_
 
 #include "matrix.h"
+#include "exception.h"
+#include <string>
 
 namespace matrix {
 /**
@@ -17,7 +19,7 @@ class MatrixCommaInitializer
     MatrixCommaInitializer(Matrix & A, double a) : counter_{1}, matrix_{A}
     {
         if (matrix_.size() == 0) {
-            sig_err("Error in MatrixCommaInitializer constructor: trying to initialize a matrix that is not allocated.");
+            throw exception::MatrixException("Error in MatrixCommaInitializer constructor: trying to initialize a matrix that is not allocated.");
         }
         matrix_(0, 0) = a;
     }
@@ -25,11 +27,11 @@ class MatrixCommaInitializer
     ~MatrixCommaInitializer()
     {
         if (counter_ < matrix_.size()) {
-            std::cout << "Error in matrix with comma initialization: too few elements.";
-            std::exit(EXIT_FAILURE);
+            string msg{"Error in `matrix::Matrix` with comma initialization: too few elements."};
+            throw exception::DimensionError(matrix_.size(), counter_, msg);
         } else if (counter_ > matrix_.size()) {
-            std::cout << "Error in matrix with comma initialization: too many elements.";
-            std::exit(EXIT_FAILURE);
+            string msg{"Error in `matrix::Matrix` with comma initialization: too many elements."};
+            throw exception::DimensionError(matrix_.size(), counter_, msg);
         }
     }
 
@@ -41,8 +43,8 @@ class MatrixCommaInitializer
     {
         this->counter_++;
         if (this->counter_ > this->matrix_.size()) {
-            std::cout << "Error in matrix with comma initialization: too many elements.";
-            std::exit(EXIT_FAILURE);
+            string msg{"Error in `matrix::Matrix` with comma initialization: too many elements."};
+            throw exception::DimensionError(matrix_.size(), counter_, msg);
         }
         this->matrix_.data()[this->counter_ - 1] = a;
         return *this;

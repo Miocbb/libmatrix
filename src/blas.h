@@ -2,7 +2,6 @@
 #define _MATRIX_BLAS_H_
 
 #include "matrix.h"
-#include "io.h"
 
 namespace matrix {
 

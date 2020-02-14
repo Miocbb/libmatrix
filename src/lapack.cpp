@@ -1,8 +1,10 @@
 
 #include <string>
+#include <sstream>
 #include "matrix.h"
 #include "lapack.h"
 #include "lapack_base.h"
+#include "exception.h"
 
 namespace matrix {
 
@@ -18,7 +20,7 @@ namespace matrix {
 int set_matrix_random_orthogonal(Matrix & Q, bool using_fixed_seed)
 {
     if (!Q.is_square()) {
-        sig_err("Error in set_matrix_random_orthogonal: matrix is not a square matrix.\n");
+        throw exception::DimensionError("Cannot make a non-square matrix to be random orthogonal.");
     }
 
     // first generate a random matrix.
@@ -43,18 +45,18 @@ int set_matrix_random_orthogonal(Matrix & Q, bool using_fixed_seed)
     // do qr factorization.
     lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt, tau, work, &lwork, &info);
     if (info < 0) {
-        printf("Error in mtx_set_matrix_random_orthogonal:"
-               "QR factorization failed."
-               "The %d-th argument had an illegal value\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "QR factorization failed. " << "The " << -info
+            << "-th argument had an illegal value\n";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
     // retrieve Q matrix from dgeqp3
     lapack::dorgqr_(&n, &n, &n, Q.data(), &n, tau, work, &lwork, &info);
     if (info < 0) {
-        printf("Error in mtx_set_matrix_random_orthogonal:"
-               "Retrieve Q matrix failed."
-               "The %d-th argument had an illegal value\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "Retrieve Q matrix failed. " << "The " << -info
+            << "-th argument had an illegal value\n";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
 
     delete [] jpvt;
@@ -77,10 +79,13 @@ int set_matrix_random_orthogonal(Matrix & Q, bool using_fixed_seed)
  */
 int diagonalize_sym_matrix_dsyev(const string & uplo, Matrix & A, vector<double> & eig)
 {
-    if (!A.is_square()) {
-        sig_err("Error to diagonalize a symmetric matrix: it is not even squared.");
+    if (A.size() == 0) {
+        return 0;
+    } else if (!A.is_square()) {
+        throw exception::DimensionError("Cannot diagonalize a matrix that is not square.");
     } else if (A.row() > eig.size()) {
-        sig_err("Error to diagonalize a symmetric matrix: eigenvalue vector size is smaller than matrix dimension.");
+        string msg{"Fail to diagonalize a symmetric matrix: eigenvector size is too small."};
+        throw exception::DimensionError(A.row(), eig.size(), msg);
     }
 
     string used_uplo;
@@ -89,7 +94,7 @@ int diagonalize_sym_matrix_dsyev(const string & uplo, Matrix & A, vector<double>
     } else if (uplo == "L") {
         used_uplo = "U";
     } else {
-        sig_err("Error to diagonalize a symmetric matrix: unkown label to access matrix data.");
+        throw matrix::exception::MatrixException("Unkown label to access a symmetric matrix data: label=" + uplo);
     }
 
     int row = A.row();
@@ -111,11 +116,12 @@ int diagonalize_sym_matrix_dsyev(const string & uplo, Matrix & A, vector<double>
 
     // Check exit status
     if (info > 0) {
-        sig_err("Error to diagonalize a symmetric matrix: diagonalization failed to converge.\n");
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, "convergence failure");
     } else if (info < 0) {
-        std::cout << "Error to diagonalize a symmetric matrix:\n";
-        std::cout << "the " << info << "-th argument had an illegal value.\n";
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "Fail to diagonalize a symmetric matrix: "
+            << "the " << -info << "-th argument had an illegal value.\n";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
 
     return 0;
@@ -131,13 +137,12 @@ int diagonalize_sym_matrix_dsyev(const string & uplo, Matrix & A, vector<double>
  */
 int invert_gen_matrix_dgetri(Matrix & A)
 {
-    if (!A.is_square()) {
-        std::cout << "Error to invert a matrix: matrix is not square.";
-        std::exit(EXIT_FAILURE);
-    } else if (A.size() == 0) {
-        std::cout << "Error to invert a matrix: matrix is empty.";
-        std::exit(EXIT_FAILURE);
+    if (A.size() == 0) {
+        return 0;
+    } else if (!A.is_square()) {
+        throw exception::DimensionError("Cannot invert a matrix that is not square.");
     }
+
     int n = A.row();
     int lwork = n;
     double *work = nullptr;
@@ -151,14 +156,14 @@ int invert_gen_matrix_dgetri(Matrix & A)
     delete [] ipiv;
 
     if (info < 0) {
-        printf("Error in losc_ri_inverse_by_dgetri():\n"
-               "the %d-th arguments had an illegal value.\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "The " << -info << "-th arguments had an illegal value.\n";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     } else if (info > 0) {
-        printf("Error in losc_ri_inverse_by_dgetri():\n"
-               "U(%d,%d) is exactly zero; the matrix is"
-               "singular and its inverse could not be computed.\n", info, info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "U(" << -info << "," << -info << ") is exactly zero; the matrix is"
+            << " singular and its inverse could not be computed.\n";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
 }
 
@@ -175,12 +180,10 @@ int invert_gen_matrix_dgetri(Matrix & A)
  */
 int invert_spd_matrix_dpotri(const string & uplo, Matrix & A)
 {
-    if (!A.is_square()) {
-        std::cout << "Error to invert a matrix: matrix is not square.";
-        std::exit(EXIT_FAILURE);
-    } else if (A.size() == 0) {
-        std::cout << "Error to invert a matrix: matrix is empty.";
-        std::exit(EXIT_FAILURE);
+    if (A.size() == 0) {
+        return 0;
+    } else if (!A.is_square()) {
+        throw exception::DimensionError("Cannot invert a matrix that is not squared.");
     }
 
     string used_uplo;
@@ -189,8 +192,7 @@ int invert_spd_matrix_dpotri(const string & uplo, Matrix & A)
     } else if (uplo == "L") {
         used_uplo = "U";
     } else {
-        std::cout << "Error to invert a symmetric matrix: unkown label to access matrix data parts.";
-        std::exit(EXIT_FAILURE);
+        throw matrix::exception::MatrixException("Unkown label to access a symmetric matrix data: label=" + uplo);
     }
 
     int n = A.row();
@@ -199,14 +201,14 @@ int invert_spd_matrix_dpotri(const string & uplo, Matrix & A)
     lapack::dpotrf_(used_uplo.c_str(), &n, A.data(), &n, &info);
     lapack::dpotri_(used_uplo.c_str(), &n, A.data(), &n, &info);
     if (info < 0) {
-        printf("Error in invert_spd_matrix_dpotri():\n"
-               "the %d-th arguments had an illegal value.\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "The " << -info << "-th arguments had an illegal value.";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     } else if (info > 0) {
-        printf("Error in invert_spd_matrix_dpotri():\n"
-               "the (%d, %d) element of the factor U is zero, and the inverse could"
-               "not be computed.", info, info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "The (" << -info << "," << -info << ") element of the factor U is zero,"
+            << " and the inverse cannot be computed.";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
     // make inverse matrix full. `dpotri` only update half of the matrix.
     A.to_symmetric(uplo);
@@ -225,12 +227,10 @@ int invert_spd_matrix_dpotri(const string & uplo, Matrix & A)
  */
 int invert_sym_matrix_dsytri(const string & uplo, Matrix &A)
 {
-    if (!A.is_square()) {
-        std::cout << "Error to invert a matrix: matrix is not square.";
-        std::exit(EXIT_FAILURE);
-    } else if (A.size() == 0) {
-        std::cout << "Error to invert a matrix: matrix is empty.";
-        std::exit(EXIT_FAILURE);
+    if (A.size() == 0) {
+        return 0;
+    } else if (!A.is_square()) {
+        throw exception::DimensionError("Cannot invert a matrix that is not squared.");
     }
 
     string used_uplo;
@@ -239,8 +239,7 @@ int invert_sym_matrix_dsytri(const string & uplo, Matrix &A)
     } else if (uplo == "L") {
         used_uplo = "U";
     } else {
-        std::cout << "Error to invert a symmetric matrix: unkown label to access matrix data parts.";
-        std::exit(EXIT_FAILURE);
+        throw exception::MatrixException("Unknown label to access a symmetric matrix data: label=" + uplo);
     }
 
     int n = A.row();
@@ -260,14 +259,14 @@ int invert_sym_matrix_dsytri(const string & uplo, Matrix &A)
     delete [] work;
     delete [] ipiv;
     if (info < 0) {
-        printf("Error in invert_sym_matrix_dsytri():\n"
-               "the %d-th arguments had an illegal value.\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "The " << -info << "-th arguments had an illegal value.";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     } else if (info > 0) {
-        printf("Error in invert_sym_matrix_dsytri():\n"
-               "D(%d,%d) = zero; the matrix is"
-               "singular and its inverse could not be computed.\n", info, info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "D(" << info << "," << info << ") = zero; the matrix is"
+            << "singular and its inverse could not be computed.";
+        throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
     // make inverse matrix full.
     A.to_symmetric(uplo);
@@ -286,12 +285,10 @@ int invert_sym_matrix_dsytri(const string & uplo, Matrix &A)
  */
 int invert_sym_matrix_dsytri_rook(const string & uplo, Matrix &A)
 {
-    if (!A.is_square()) {
-        std::cout << "Error to invert a matrix: matrix is not square.";
-        std::exit(EXIT_FAILURE);
-    } else if (A.size() == 0) {
-        std::cout << "Error to invert a matrix: matrix is empty.";
-        std::exit(EXIT_FAILURE);
+    if (A.size() == 0) {
+        return 0;
+    } else if (!A.is_square()) {
+        throw exception::DimensionError("Cannot invert a matrix that is not squared.");
     }
 
     string used_uplo;
@@ -300,8 +297,7 @@ int invert_sym_matrix_dsytri_rook(const string & uplo, Matrix &A)
     } else if (uplo == "L") {
         used_uplo = "U";
     } else {
-        std::cout << "Error to invert a symmetric matrix: unkown label to access matrix data parts.";
-        std::exit(EXIT_FAILURE);
+        throw exception::MatrixException("Unknown label to access a symmetric matrix data: label=" + uplo);
     }
 
     int n = A.row();
@@ -321,14 +317,14 @@ int invert_sym_matrix_dsytri_rook(const string & uplo, Matrix &A)
     delete [] work;
     delete [] ipiv;
     if (info < 0) {
-        printf("Error in invert_sym_matrix_dsytri_rook():\n"
-               "the %d-th arguments had an illegal value.\n", -info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "The " << -info << "-th arguments had an illegal value.";
+        throw exception::MatrixOperationError(__FUNCTION__, msg.str());
     } else if (info > 0) {
-        printf("Error in invert_sym_matrix_dsytri_rook():\n"
-               "D(%d,%d) = zero; the matrix is"
-               "singular and its inverse could not be computed.\n", info, info);
-        std::exit(EXIT_FAILURE);
+        std::stringstream msg;
+        msg << "D(" << info << "," << info << ") = zero; the matrix is"
+            << "singular and its inverse could not be computed.";
+        throw exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
     // make inverse matrix full.
     A.to_symmetric(uplo);

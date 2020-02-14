@@ -7,10 +7,125 @@
 #include "comma_initialize.h"
 #include <random>
 #include <cmath>
+#include "exception.h"
 
 namespace matrix {
 
 static std::mt19937 g_rand_generator_mt19937_seed_fixed(1);
+
+/**
+ * construct a matrix from a std::vector<double>.
+ *
+ * The data size of the vector will be check to match the matrix size.
+ *
+ * This constructor is not const friendly. If you want to do a shallow copy
+ * of a const vector to the matrix, you can do declare the created Matrix to
+ * be const and typecast the const vector to be non-const vector, that is,
+ * ```
+ * const vector<double> data;
+ * const Matrix A(row, col, const_cast <vector<double>>(data), kShallowCopy);
+ * ```
+ * This can preserve the created matrix not change the original vector data.
+ *
+ * @ param[in] data: the input matrix data.
+ * @ param[in] copy_type: If copy_type is deep copy, all the data
+ *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
+ *  data memory is assigned to the matrix and the matrix gains the access to the data.
+ */
+Matrix::Matrix(size_t row, size_t col, vector<double> & inp_data, CopyType copy_type)
+: row_(row), col_(col), size_(row * col), data_vec_(0)
+{
+    if (size_ != inp_data.size()) {
+        throw exception::DimensionError(size_, inp_data.size(), "Fail to create a `matrix::Matrix` from a `std::vector`.");
+    }
+    if (copy_type == kDeepCopy) {
+        data_vec_ = inp_data;
+        data_ptr_ = data_vec_.data();
+    } else if (copy_type == kShallowCopy) {
+        data_ptr_ = inp_data.data();
+    } else {
+        throw exception::MatrixException("Fail to create a `matrix::Matrix` object: unknown copy type.");
+    }
+}
+
+/**
+ * construct a matrix from a double array pointer.
+ *
+ * The data size of the array will NOT be check to match the matrix size.
+ * Use this constructor carefully.
+ *
+ * This constructor is not const friendly. If you want to do a shallow copy
+ * of a const double array to the matrix, you can do declare the created Matrix to
+ * be const and typecast the const array to be non-const array, that is,
+ * ```
+ * const double * data;
+ * const Matrix A(row, col, const_cast <double *>(data), kShallowCopy);
+ * ```
+ * This can preserve the created matrix not change the original array data.
+ *
+ * @ param[in] data: the input matrix data.
+ * @ param[in] copy_type: If copy_type is deep copy, all the data
+ *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
+ *  data memory is assigned to the matrix and the matrix gains the access to the data.
+ */
+Matrix::Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type)
+: row_(row), col_(col), size_(row * col), data_vec_(0)
+{
+    if (copy_type == kDeepCopy) {
+        data_vec_.resize(size_);
+        data_ptr_ = data_vec_.data();
+        int dim = size_;
+        blas::dcopy_(&dim, inp_data_ptr, blas::ione, data_ptr_, blas::ione);
+    } else if (copy_type == kShallowCopy) {
+        data_ptr_ = inp_data_ptr;
+    } else {
+        throw exception::MatrixException("Fail to create a `matrix::Matrix` object: unknown copy type.");
+    }
+}
+
+/**
+ * Copy assignment operator overloading: enable an easy way to do matrix
+ * element initialization with std::initializer_list.
+ *
+ * The matrix dimension has to be declared in advance. The input list size
+ * will be checked for the initialization.
+ * e.g.
+ * Matrix A(2, 2);
+ * A = {1, 2,
+ *      3, 4};
+ *
+ * @ param[in] init_list: the data contained in the initializer_list.
+ * @ return: the const reference to the matrix itself.
+ */
+const Matrix & Matrix::operator = (std::initializer_list<double> init_list)
+{
+    if (init_list.size() != this->size()) {
+        string msg {"Fail to initialize `matrix::Matrix` with initializer_list syntax. Unmatched size."};
+        throw exception::DimensionError(this->size(), init_list.size(), msg);
+    }
+    size_t i = 0;
+    for (auto p = init_list.begin(); p != init_list.end(); p++) {
+        this->data()[i] = *p;
+        i++;
+    }
+}
+
+/**
+ * access the matrix element by index with bound check.
+ *
+ * @ param i the row index of the element
+ * @ param j the column index of the element
+ * @ return referent to the matrix element.
+ */
+const double & Matrix::at(size_t i, size_t j) const
+{
+    if (i >= row_ || j >= col_) {
+        std::stringstream msg;
+        msg << "Index is out of range at position (" << i << ", " << j << ".";
+        throw exception::IndexRangeError(msg.str());
+    }
+    return (*this)(i, j);
+}
 
 /**
  * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
@@ -127,9 +242,6 @@ bool Matrix::is_diagonal(double threshold) const
 bool Matrix::is_identity(double threshold) const
 {
     threshold = std::fabs(threshold);
-    if (fabs(threshold) >= 1e-3) {
-        sig_err("Error to test matrix identity: threshold is too big to make sense.\n");
-    }
     if (row_ != col_) {
         return false;
     }
@@ -156,9 +268,6 @@ bool Matrix::is_identity(double threshold) const
 bool Matrix::is_zeros(double threshold) const
 {
     threshold = std::fabs(threshold);
-    if (fabs(threshold) >= 1e-3) {
-        sig_err("Error to test zero matrix: threshold is too big to make sense.\n");
-    }
     const Matrix & T = *this;
     for (size_t i = 0; i < size_; i++) {
         if (std::fabs(T.data()[i]) > threshold) {
@@ -207,7 +316,7 @@ bool Matrix::is_same_dimension_to(const Matrix &other) const
 double Matrix::trace() const
 {
     if (!this->is_square()) {
-        sig_err("Error to get matrix trace: matrix is not square.");
+        throw exception::DimensionError("Cannot get trace of a matrix that is not squared.");
     }
     double rst = 0.0;
     for (size_t i = 0; i < row_; i++) {
@@ -225,7 +334,7 @@ double Matrix::trace() const
 Matrix & Matrix::to_symmetric(const string & uplo)
 {
     if (row_ != col_) {
-        sig_err("Error: fail to symmetrize the matrix, which isn't square.");
+        throw exception::DimensionError("Cannot symmetrize a matrix that is not squared.");
     }
     if (uplo == "U") {
         for (size_t i = 0; i < row_; i++) {
@@ -322,7 +431,7 @@ Matrix & Matrix::fill_all(double a)
 Matrix & Matrix::set_identity()
 {
     if (!this->is_square()) {
-        sig_err("Error: cannot make a non-square matrix to be identity.\n");
+        throw exception::DimensionError("Cannot make a non-square matrix to be identity.");
     }
     this->fill_all(0.0);
     #ifdef USE_OPENMP

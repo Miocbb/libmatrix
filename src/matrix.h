@@ -12,9 +12,7 @@
 #include <string>
 #include <iostream>
 #include <initializer_list>
-#include "io.h"
 #include "blas_base.h"
-
 
 namespace matrix {
 
@@ -81,22 +79,7 @@ class Matrix
      *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
      *  data memory is assigned to the matrix and the matrix gains the access to the data.
      */
-    Matrix(size_t row, size_t col, vector<double> & inp_data, CopyType copy_type)
-    : row_(row), col_(col), size_(row * col), data_vec_(0)
-    {
-        if (size_ != inp_data.size()) {
-            std::cout << "Error in creating a matrix from a vector object: unmatched size.";
-            std::exit(EXIT_FAILURE);
-        }
-        if (copy_type == kDeepCopy) {
-            data_vec_ = inp_data;
-            data_ptr_ = data_vec_.data();
-        } else if (copy_type == kShallowCopy) {
-            data_ptr_ = inp_data.data();
-        } else {
-            sig_err("Error in Matrix constructor: unknown copy type.");
-        }
-    }
+    Matrix(size_t row, size_t col, vector<double> & inp_data, CopyType copy_type);
 
     /**
      * construct a matrix from a double array pointer.
@@ -118,20 +101,7 @@ class Matrix
      *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
      *  data memory is assigned to the matrix and the matrix gains the access to the data.
      */
-    Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type)
-    : row_(row), col_(col), size_(row * col), data_vec_(0)
-    {
-        if (copy_type == kDeepCopy) {
-            data_vec_.resize(size_);
-            data_ptr_ = data_vec_.data();
-            int dim = size_;
-            blas::dcopy_(&dim, inp_data_ptr, blas::ione, data_ptr_, blas::ione);
-        } else if (copy_type == kShallowCopy) {
-            data_ptr_ = inp_data_ptr;
-        } else {
-            sig_err("Error in Matrix constructor: unknown copy type.");
-        }
-    }
+    Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type);
 
     /**
      * default constructor.
@@ -186,19 +156,7 @@ class Matrix
      * @ param[in] init_list: the data contained in the initializer_list.
      * @ return: the const reference to the matrix itself.
      */
-    const Matrix & operator = (std::initializer_list<double> init_list)
-    {
-        if (init_list.size() != this->size()) {
-            std::cout << "Error to initialize the matrix with initializer_list syntax. "
-                << "Unmatched size." << std::endl;
-            std::exit(EXIT_FAILURE);
-        }
-        size_t i = 0;
-        for (auto p = init_list.begin(); p != init_list.end(); p++) {
-            this->data()[i] = *p;
-            i++;
-        }
-    }
+    const Matrix & operator = (std::initializer_list<double> init_list);
 
     /**
      * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
@@ -252,13 +210,7 @@ class Matrix
      * @ param j the column index of the element
      * @ return referent to the matrix element.
      */
-    const double & at(size_t i, size_t j) const
-    {
-        if (i >= row_ || j >= col_) {
-            sig_err("Error: matrix index is out of bound.\n");
-        }
-        return (*this)(i, j);
-    }
+    const double & at(size_t i, size_t j) const;
 
     /**
      * get the pointer that points to the begining of
