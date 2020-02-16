@@ -9,12 +9,14 @@
  * Matrix storage format: column-wise full storage.
  * Matrix index: index starts from zero.
  */
-
+#ifndef _MATRIX_INCLUDE_MATRIX_MATRIX_H_
+#define _MATRIX_INCLUDE_MATRIX_MATRIX_H_
 
 #include "../src/matrix.h"
 #include "../src/matrix_io.h"
 #include "../src/comma_initialize.h"
 #include "../src/blas.h"
-#include "../src/blas_base.h"
 #include "../src/lapack.h"
-#include "../src/lapack_base.h"
+#include "../src/exception.h"
+
+#endif

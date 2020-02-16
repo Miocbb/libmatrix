@@ -1,6 +1,5 @@
-
-#ifndef _MATRIX_LAPACK_H_
-#define _MATRIX_LAPACK_H_
+#ifndef _MATRIX_SRC_LAPACK_H_
+#define _MATRIX_SRC_LAPACK_H_
 
 #include "matrix.h"
 
@@ -79,6 +78,7 @@ int invert_sym_matrix_dsytri(const string & uplo, Matrix &A);
  * @ return integer 0 refers to success.
  */
 int invert_sym_matrix_dsytri_rook(const string & uplo, Matrix &A);
-}
 
-#endif
+}   // namespace matrix
+
+#endif  // _MATRIX_SRC_LAPACK_H_H

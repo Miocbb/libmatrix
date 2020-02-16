@@ -1,8 +1,8 @@
-#ifndef _MATRIX_MATRIX_IO_H_
-#define _MATRIX_MATRIX_IO_H_
+#ifndef _MATRIX_SRC_MATRIX_IO_H_
+#define _MATRIX_SRC_MATRIX_IO_H_
 
-#include "matrix.h"
 #include <memory>
+#include "matrix.h"
 
 namespace matrix {
 
@@ -21,6 +21,7 @@ void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat, const char 
  */
 std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(const char *fname);
 std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(string &fname);
-}
 
-#endif  // _MATRIX_MATRIX_IO_H_
+}   // namespace matrix
+
+#endif  // _MATRIX_SRC_MATRIX_IO_H_

@@ -1,5 +1,5 @@
-#ifndef _MATRIX_BLAS_H_
-#define _MATRIX_BLAS_H_
+#ifndef _MATRIX_SRC_BLAS_H_
+#define _MATRIX_SRC_BLAS_H_
 
 #include "matrix.h"
 
@@ -54,6 +54,6 @@ inline int mult_dscal(const double alpha, Matrix & A)
  */
 int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B);
 
-}
+}   // namespace matrix
 
-#endif
+#endif  // _MATRIX_SRC_BLAS_H_

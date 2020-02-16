@@ -3,10 +3,11 @@
  */
 
 #include "matrix.h"
-#include "blas_base.h"
-#include "comma_initialize.h"
+
 #include <random>
 #include <cmath>
+#include "blas_base.h"
+#include "comma_initialize.h"
 #include "exception.h"
 
 namespace matrix {
@@ -81,6 +82,39 @@ Matrix::Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type)
     } else {
         throw exception::MatrixException("Fail to create a `matrix::Matrix` object: unknown copy type.");
     }
+}
+
+/**
+ * Copy constructor.
+ *
+ * Always do a deep copy.
+ */
+Matrix::Matrix(const Matrix & other)
+    : row_{other.row()}, col_{other.col()}, size_{other.size()},
+    data_vec_(size_), data_ptr_{data_vec_.data()}
+{
+    int dim = size_;
+    blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
+}
+
+/**
+ * Copy assignment operator overloading.
+ *
+ * Always make a deep copy of the matrix and assign it to the destination.
+ */
+Matrix& Matrix::operator = (const Matrix & other)
+{
+    if (&other == this) {
+        return *this;
+    }
+    row_ = other.row();
+    col_ = other.col();
+    size_ = other.size();
+    data_vec_.resize(size_);
+    data_ptr_ = data_vec_.data();
+    int dim = size_;
+    blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
+    return *this;
 }
 
 /**
@@ -442,5 +476,4 @@ Matrix & Matrix::set_identity()
     }
 }
 
-
-}
+}   // namespace matrix

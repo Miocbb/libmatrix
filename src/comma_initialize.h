@@ -1,9 +1,9 @@
-#ifndef _MATRIX_COMMA_INITIALIZE_H_
-#define _MATRIX_COMMA_INITIALIZE_H_
+#ifndef _MATRIX_SRC_COMMA_INITIALIZE_H_
+#define _MATRIX_SRC_COMMA_INITIALIZE_H_
 
+#include <string>
 #include "matrix.h"
 #include "exception.h"
-#include <string>
 
 namespace matrix {
 /**
@@ -51,6 +51,6 @@ class MatrixCommaInitializer
     }
 };
 
-}
+}   // namespace matrix
 
-#endif // _MATRIX_COMMA_INITIALIZE_H_
+#endif // _MATRIX_SRC_COMMA_INITIALIZE_H_

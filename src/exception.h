@@ -1,5 +1,5 @@
-#ifndef _MATRIX_EXCEPTION_H_
-#define _MATRIX_EXCEPTION_H_
+#ifndef _MATRIX_SRC_EXCEPTION_H_
+#define _MATRIX_SRC_EXCEPTION_H_
 
 #include <stdexcept>
 #include <string>
@@ -82,9 +82,7 @@ public:
     }
 };
 
+}   // namespace  matrix::exception
+}   // namespace matrix
 
-}
-
-}
-
-#endif // _MATRIX_EXCEPTION_H_
+#endif // _MATRIX_SRC_EXCEPTION_H_

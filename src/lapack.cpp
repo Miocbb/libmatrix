@@ -1,8 +1,8 @@
+#include "lapack.h"
 
 #include <string>
 #include <sstream>
 #include "matrix.h"
-#include "lapack.h"
 #include "lapack_base.h"
 #include "exception.h"
 
@@ -331,4 +331,4 @@ int invert_sym_matrix_dsytri_rook(const string & uplo, Matrix &A)
     return 0;
 }
 
-}
+}   // namespace matrix

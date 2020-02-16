@@ -1,8 +1,9 @@
 #include "matrix_io.h"
-#include "matrix.h"
+
 #include <unistd.h>
 #include <assert.h>
 #include <sstream>
+#include "matrix.h"
 #include "exception.h"
 
 namespace matrix {
@@ -94,4 +95,4 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(string &fname)
     return read_matrices_from_binary(fname.c_str());
 }
 
-}
+}   // namespace matrix

@@ -4,8 +4,8 @@
  * declearation for lapack library.
  */
 
-#ifndef _MATRIX_LAPACK_BASE_H_
-#define _MATRIX_LAPACK_BASE_H_
+#ifndef _MATRIX_SRC_LAPACK_BASE_H_
+#define _MATRIX_SRC_LAPACK_BASE_H_
 
 namespace matrix {
 
@@ -27,8 +27,7 @@ extern "C" void dsytri_(const char *uplo, const int *n, double *a, const int *ld
 extern "C" void dsytrf_rook_(const char *uplo, const int *n, double *a, const int *lda, int *ipiv, double *work, int *lwork, int*info);
 extern "C" void dsytri_rook_(const char *uplo, const int *n, double *a, const int *lda, int *ipiv, double *work, int*info);
 
-}
+}   // namespace matrix::lapack
+}   // namespace matrix
 
-}
-
-#endif
+#endif  // _MATRIX_SRC_LAPACK_BASE_H_

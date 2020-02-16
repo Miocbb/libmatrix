@@ -4,15 +4,14 @@
  * matrix class decleration.
  */
 
-#ifndef _MATRIX_MATRIX_H_
-#define _MATRIX_MATRIX_H_
+#ifndef _MATRIX_SRC_MATRIX_H_
+#define _MATRIX_SRC_MATRIX_H_
 
 #include <vector>
 #include <cstddef>
 #include <string>
 #include <iostream>
 #include <initializer_list>
-#include "blas_base.h"
 
 namespace matrix {
 
@@ -115,32 +114,14 @@ class Matrix
      *
      * Always do a deep copy.
      */
-    Matrix(const Matrix & other) : row_{other.row()}, col_{other.col()}, size_{other.size()},
-    data_vec_(size_), data_ptr_{data_vec_.data()}
-    {
-        int dim = size_;
-        blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
-    }
+    Matrix(const Matrix & other);
 
     /**
      * Copy assignment operator overloading.
      *
      * Always make a deep copy of the matrix and assign it to the destination.
      */
-    Matrix & operator = (const Matrix & other)
-    {
-        if (&other == this) {
-            return *this;
-        }
-        row_ = other.row();
-        col_ = other.col();
-        size_ = other.size();
-        data_vec_.resize(size_);
-        data_ptr_ = data_vec_.data();
-        int dim = size_;
-        blas::dcopy_(&dim, other.data(), blas::ione, data_ptr_, blas::ione);
-        return *this;
-    }
+    Matrix & operator = (const Matrix & other);
 
     /**
      * Copy assignment operator overloading: enable an easy way to do matrix
@@ -384,6 +365,6 @@ class Matrix
 
 };
 
-}
+}   // namespace matrix
 
-#endif
+#endif  // _MATRIX_SRC_MATRIX_H_

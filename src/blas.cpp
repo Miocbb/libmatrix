@@ -1,5 +1,6 @@
-#include <string>
 #include "matrix.h"
+
+#include <string>
 #include "blas.h"
 #include "blas_base.h"
 #include "exception.h"
@@ -234,4 +235,4 @@ int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B)
     return 0;
 }
 
-}
+}   // namespace matrix

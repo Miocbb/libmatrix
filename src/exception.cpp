@@ -1,4 +1,5 @@
 #include "exception.h"
+
 #include <sstream>  // std::stringstream
 
 namespace matrix {
@@ -10,6 +11,5 @@ void MatrixException::make_message(const char* msg)
     msg_ << "Fatal error: " << msg << std::endl;
 }
 
-
-}
-}
+}   // namespace matrix::exception
+}   // namespace matrix
