@@ -11,3 +11,10 @@ cd build
 cmake ../
 make
 ```
+
+To generate documentation: need `doxygen` tool.
+```
+cd doc
+doxygen Doxyfile
+```
+Then open the `doc/doxygen_html/index.html` with your preferred browser to check it out.

@@ -9,3 +9,6 @@ googletest/
 
 # extern
 extern*/
+
+# doxygen
+**/doxygen*/
