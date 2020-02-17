@@ -1,230 +1,266 @@
 /**
- * file: matrix.h
- *
- * matrix class decleration.
+ * @file
+ * @brief Decleration matrix class.
  */
 
 #ifndef _MATRIX_SRC_MATRIX_H_
 #define _MATRIX_SRC_MATRIX_H_
 
-#include <vector>
 #include <cstddef>
-#include <string>
-#include <iostream>
 #include <initializer_list>
-
-namespace matrix {
-
-using std::vector;
-using std::size_t;
-using std::string;
+#include <iostream>
+#include <string>
+#include <vector>
 
 /**
- * Helper class used to do comma initialization for matrix object like Eigen library.
+ * @brief top-level matrix namespace.
+ */
+namespace matrix {
+
+using std::size_t;
+using std::string;
+using std::vector;
+
+/**
+ * @brief Helper class used to do comma initialization for matrix object like
+ * Eigen library.
  */
 class MatrixCommaInitializer;
 
-class Matrix
-{
-    private:
+/**
+ * @brief Matrix class declaration.
+ */
+class Matrix {
+  private:
     size_t row_;
     size_t col_;
     size_t size_;
     /* The data of matrix is either stored in vector `data_` or outside of the
      * object that is pointed by the double pointer `data_ptr_`. */
     vector<double> data_vec_;
-    double * data_ptr_;     /* This pointer will always point to the head of the matrix data.
-                             * No memory allocation is assigned for this pointer. */
+    double *data_ptr_; /* This pointer will always point to the head of the
+                        * matrix data.
+                        * No memory allocation is assigned for this pointer. */
 
-    public:
-
+  public:
+    /**
+     * @brief copy types.
+     */
     enum CopyType {
-        kShallowCopy,
-        kDeepCopy,
+        kShallowCopy, /**< shallow copy: only gain data access and avoid copying
+                         data elements */
+        kDeepCopy,    /**< deep copy: copy all the data. */
     };
 
     /**
-     * construct a matrix with given size.
+     * @brief Construct a matrix with given size.
      *
-     * the memory for a matrix with input size will
+     * @details The memory for a matrix with input size will
      * be allocated and initialize all matrix elements
-     * to be zero.
+     * to be zero. Matrix data is stored in inside of this object.
      *
-     * matrix data is stored in inside of this object.
-     *
-     * @ param row row number of matrix
-     * @ param col column number of matrix
+     * @param [in] row: Number of rows of the matrix
+     * @param [in] col: Number of columns of the matrix
      */
     Matrix(size_t row, size_t col)
-    : row_(row), col_(col), data_vec_(row * col, 0.0), size_(row * col),
-    data_ptr_{data_vec_.data()} {}
+        : row_(row), col_(col), data_vec_(row * col, 0.0),
+          size_(row * col), data_ptr_{data_vec_.data()}
+    {
+    }
 
     /**
-     * construct a matrix from a std::vector<double>.
+     * @brief Construct a matrix from a std::vector<double>.
      *
-     * The data size of the vector will be check to match the matrix size.
+     * @param [in] row: Number of rows of the matrix.
+     * @param [in] col: Number of columns of the matrix.
+     * @param [in] inp_data: A std::vector<double> that stores the matrix data.
+     * @param [in] copy_type: Copy type to initialize the matrix from \p
+     * inp_data. If \p copy_type equals to matrix::Matrix::kDeepCopy, all the
+     * data will be copied into matrix. If the \p copy type equals to
+     * matrix::Matrix::kShallowCopy, the pointer to the data memory is assigned
+     * to the matrix and the matrix gains the access to the data.
      *
-     * This constructor is not const friendly. If you want to do a shallow copy
-     * of a const vector to the matrix, you can do declare the created Matrix to
-     * be const and typecast the const vector to be non-const vector, that is,
-     * ```
+     * @note The data size of the vector will be check to match the matrix size.
+     * @note This constructor is not const friendly. If you want to do a shallow
+     * copy of a const vector to the matrix, you can do declare the created
+     * Matrix to be const and typecast the const vector to be non-const vector,
+     * that is,
+     * @code
      * const vector<double> data;
-     * const Matrix A(row, col, const_cast <vector<double>>(data), kShallowCopy);
-     * ```
-     * This can preserve the created matrix not change the original vector data.
-     *
-     * @ param[in] data: the input matrix data.
-     * @ param[in] copy_type: If copy_type is deep copy, all the data
-     *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
-     *  data memory is assigned to the matrix and the matrix gains the access to the data.
+     * const Matrix A(row, col, const_cast <vector<double>>(data),
+     *                kShallowCopy);
+     * @endcode
+     * This can preserve the created matrix not change the original vector
+     * data.
      */
-    Matrix(size_t row, size_t col, vector<double> & inp_data, CopyType copy_type);
+    Matrix(size_t row, size_t col, vector<double> &inp_data,
+           CopyType copy_type);
 
     /**
-     * construct a matrix from a double array pointer.
+     * @brief Construct a matrix from a double array pointer.
      *
-     * The data size of the array will NOT be check to match the matrix size.
-     * Use this constructor carefully.
+     * @param [in] inp_data_ptr: a pointer points to double array that stores
+     * the matrix data.
+     * @param [in] copy_type: If \p copy_type equals matrix::Matrix::kDeepCopy,
+     * all the data will be copied into matrix. If the \p copy_type equals to
+     * matrix::Matrix::kShallowCopy, the pointer \p inp_data_ptr is stored in
+     * the matrix to gain the access to matrix data.
      *
-     * This constructor is not const friendly. If you want to do a shallow copy
-     * of a const double array to the matrix, you can do declare the created Matrix to
-     * be const and typecast the const array to be non-const array, that is,
+     * @note The data size of the array will NOT be check to match the matrix
+     * size. Use this constructor carefully.
+     * @note This constructor is not const friendly. If you want to do a shallow
+     * copy of a const double array to the matrix, you can do declare the
+     * created Matrix to be const and typecast the const array to be non-const
+     * array, that is,
      * ```
      * const double * data;
      * const Matrix A(row, col, const_cast <double *>(data), kShallowCopy);
      * ```
      * This can preserve the created matrix not change the original array data.
-     *
-     * @ param[in] data: the input matrix data.
-     * @ param[in] copy_type: If copy_type is deep copy, all the data
-     *  will be copied into matrix. If the copy type is shallow copy, the pointer to the
-     *  data memory is assigned to the matrix and the matrix gains the access to the data.
      */
     Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type);
 
     /**
-     * default constructor.
-     *
-     * creat an empty matrix object.
+     * @brief Default constructor.
+     * @details Create an empty matrix object with dimension [0, 0].
      */
     Matrix() : row_(0), col_(0), size_(0), data_vec_(0), data_ptr_{nullptr} {}
 
     /**
-     * Copy constructor.
+     * @brief Copy constructor: copy from a matrix.
      *
-     * Always do a deep copy.
+     * @param [in] other: the other matrix to be copied.
      */
-    Matrix(const Matrix & other);
+    Matrix(const Matrix &other);
 
     /**
-     * Copy assignment operator overloading.
+     * @brief Copy assignment operator: assign from a matrix.
      *
-     * Always make a deep copy of the matrix and assign it to the destination.
+     * @param [in] other: the other matrix used for assignment.
      */
-    Matrix & operator = (const Matrix & other);
+    Matrix &operator=(const Matrix &other);
 
     /**
-     * Copy assignment operator overloading: enable an easy way to do matrix
-     * element initialization with std::initializer_list.
-     *
-     * The matrix dimension has to be declared in advance. The input list size
-     * will be checked for the initialization.
-     * e.g.
-     * Matrix A(2, 2);
-     * A = {1, 2,
-     *      3, 4};
+     * @brief Copy assignment operator: enable an easy way to do matrix
+     * element assignment from std::initializer_list.
      *
      * @ param[in] init_list: the data contained in the initializer_list.
      * @ return: the const reference to the matrix itself.
+     *
+     * @note The matrix dimension has to be declared in advance. The input list
+     * size will be checked for the initialization. Below is an example,
+     * @code
+     * Matrix A(2, 2); // create a matrix with dimension [2, 2] first.
+     * A = {1, 2,      // initialization with initializer_list. A(0, 1) = 2,
+     *      3, 4};     // and A(1, 0) = 3.
+     * A = {1, 2, 3};  // Error: will throw an error for unmatched size.
+     * @endcode
      */
-    const Matrix & operator = (std::initializer_list<double> init_list);
+    const Matrix &operator=(std::initializer_list<double> init_list);
 
     /**
-     * Initialize matrix object with the help of `<<` and `,` operator in an easy way.
-     * That is, `A << 1, 2, 3, 4;`. The matrix dimension of A has to be specified
-     * in advance and the number of elements has to be equal to the matrix size,
-     * otherwise, it will abort with error.
+     * @brief operator << overloading for comma initialization like Eigen3
+     * library.
+     *
+     * @param [in] a: an element.
+     *
+     * @note Initialize matrix object with the help of operator `<<` and `,` in
+     * an easy way. That is,
+     * @code
+     * Matrix A(2, 2); // create a matrix with dimension [2, 2] first.
+     * A << 1, 2,      // initialization with comma initialization. A(0, 1) = 2,
+     *      3, 4;      // and A(1, 0) = 3.
+     * A << 1, 2, 3;   // Error: will throw an error for unmatched size.
+     * @endcode
+     * The matrix dimension of A has to be specified in advance and the
+     * number of elements has to be equal to the matrix size, otherwise, it
+     * will throw an error.
      */
-    MatrixCommaInitializer operator <<(double a);
+    MatrixCommaInitializer operator<<(double a);
 
     /**
-     * access/modify the matrix element by index without
+     * @brief Access/modify the matrix element by index without
      * bound check.
      *
-     * @ param i the row index of the element
-     * @ param j the column index of the element
-     * @ return referent to the matrix element.
+     * @param [in] i: The row index of the element
+     * @param [in] j: The column index of the element
+     * @return double&: matrix element [\p i, \p j].
      */
-    double & operator()(size_t i, size_t j) {
-        return const_cast<double &>(
-            static_cast<const Matrix &>(*this)(i, j)
-        );
+    double &operator()(size_t i, size_t j)
+    {
+        return const_cast<double &>(static_cast<const Matrix &>(*this)(i, j));
     };
 
     /**
-     * access the matrix element by index without bound check.
+     * @brief Access the matrix element by index without bound check.
      *
-     * @ param i the row index of the element
-     * @ param j the column index of the element
-     * @ return const referent to the element value.
+     * @param [in] i: The row index of the element
+     * @param [in] j: The column index of the element
+     * @return const double&: matrix element [\p i, \p j].
      */
-    const double & operator()(size_t i, size_t j) const {return data_ptr_[i * col_ + j];};
+    const double &operator()(size_t i, size_t j) const
+    {
+        return data_ptr_[i * col_ + j];
+    };
 
     /**
-     * access/modify the matrix element by index with bound check.
+     * @brief Access/modify the matrix element by index with bound check.
      *
-     * @ param i the row index of the element
-     * @ param j the column index of the element
-     * @ return referent to the matrix element.
+     * @param [in] i: The row index of the element
+     * @param [in] j: The column index of the element
+     * @return double&: matrix element [\p i, \p j].
      */
-    double & at(size_t i, size_t j)
+    double &at(size_t i, size_t j)
     {
         return const_cast<double &>(
-            static_cast<const Matrix &>(*this).at(i, j)
-        );
+            static_cast<const Matrix &>(*this).at(i, j));
     }
 
     /**
-     * access the matrix element by index with bound check.
+     * @brief Access the matrix element by index with bound check.
      *
-     * @ param i the row index of the element
-     * @ param j the column index of the element
-     * @ return referent to the matrix element.
+     * @param [in] i: The row index of the element
+     * @param [in] j: The column index of the element
+     * @return const double&: matrix element [\p i, \p j].
      */
-    const double & at(size_t i, size_t j) const;
+    const double &at(size_t i, size_t j) const;
 
     /**
-     * get the pointer that points to the begining of
-     * matrix data.
+     * @brief Get the pointer that points to the begining of matrix data.
+     * @return double *
      */
-    double * data() {return data_ptr_;}
+    double *data() { return data_ptr_; }
 
     /**
-     * get the const pointer that points to the begining of
-     * matrix data.
+     * @brief Get the const pointer that points to the begining of matrix data.
+     * @return const double *
      */
-    const double * data() const {return data_ptr_;}
+    const double *data() const { return data_ptr_; }
 
     /**
-     * get matrix row numbers.
+     * @brief Get matrix row numbers.
+     * @return size_t
      */
-    const size_t & row() const {return row_;}
+    const size_t &row() const { return row_; }
 
     /**
-     * get matrix column numbers.
+     * @brief Get matrix column numbers.
+     * @return size_t
      */
-    const size_t & col() const {return col_;}
+    const size_t &col() const { return col_; }
 
     /**
-     * get matrix size, that is, how many elements the matrix has.
+     * @brief Get matrix size, that is, the total number of matrix elements.
+     * @return size_t
      */
-    const size_t & size() const {return size_;}
+    const size_t &size() const { return size_; }
 
     /**
-     * check if the data is stored in vector or outside of the object.
-     *
-     * special case:
-     * if the matrix is an empty matrix, it will return false.
+     * @brief Check if the matrix data is managed by the object.
+     * @details If true, the matrix data will be destroyed along with the
+     * object. otherwise, it will not.
+     * @return bool
+     * @note if the matrix is an empty matrix, it will return false.
      */
     bool is_data_stored_outside() const
     {
@@ -236,135 +272,147 @@ class Matrix
     }
 
     /**
-     * check if the matrix is square or not.
+     * @brief Check if the matrix is square or not.
+     * @return bool
      */
-    bool is_square() const {return (row_ == col_);}
+    bool is_square() const { return (row_ == col_); }
 
     /**
-     * check if the current matrix is symmetric or not based on
-     * input threshold. Default threshold is 1e-10.
+     * @brief Check if the current matrix is symmetric or not based on
+     * the input threshold. Default threshold is 1e-10.
      *
-     * @ param [in] threshold the threshold of testing float number's equality.
-     * @ return bool.
+     * @param [in] threshold: the threshold of testing equality between two
+     * float numbers.
+     * @return bool.
      */
     bool is_symmetric(double threshold = 1e-10) const;
 
     /**
-     * check if the current matrix is a diagonal matrix or not based on
+     * @brief Check if the current matrix is a diagonal matrix or not based on
      * input threshold. Default threshold is 1e-10.
      *
-     * @ param [in] threshold the threshold of testing float number's equality.
-     * @ return bool.
+     * @param [in] threshold: the threshold of testing equality between two
+     * float numbers.
+     * @return bool.
      */
     bool is_diagonal(double threshold = 1e-10) const;
 
     /**
-     * check if the current matrix is identity or not based on
-     * input threshold. Default threshold is 1e-10. The threshold
-     * has to be equal or less than 1e-3 to make sense.
+     * @brief Check if the current matrix is identity or not based on
+     * input threshold. Default threshold is 1e-10.
      *
-     * @ param [in] threshold the threshold of testing float number's equality.
-     * @ return bool.
+     * @param [in] threshold: the threshold of testing equality between two
+     * float numbers.
+     * @return bool.
      */
     bool is_identity(double threshold = 1e-10) const;
 
     /**
-     * check if the current matrix is a zero matrix or not based on
-     * input threshold. Default threshold is 1e-10. The threshold has
-     * to be equal or less than 1e-3 to make sense.
+     * @brief Check if the current matrix is a zero matrix or not based on
+     * input threshold. Default threshold is 1e-10.
      *
-     * @ param [in] threshold the threshold of testing float number's equality.
-     * @ return bool.
+     * @param [in] threshold: the threshold of testing equality between two
+     * float numbers.
+     * @return bool.
      */
     bool is_zeros(double threshold = 1e-10) const;
 
     /**
-     * check if two matrix is equal by scanning everything based on
+     * @brief Check if two matrix is equal by scanning everything based on
      * a threshold. By default, the threshold is 1e-10.
      *
-     * @ param A the compared matrix.
-     * @ return bool
+     * @param [in] other: the other matrix to be compared with.
+     * @return bool
      */
-    bool is_equal_to(const Matrix & A, double threshold = 1e-10) const;
+    bool is_equal_to(const Matrix &other, double threshold = 1e-10) const;
 
     /**
-     * check if two matrix has the same dimension.
+     * @brief Check if two matrix has the same dimension.
      *
-     * @ param[in] other: the other matrix.
-     * @ return bool.
+     * @param[in] other: the other matrix to be compared with.
+     * @return bool.
      */
     bool is_same_dimension_to(const Matrix &other) const;
 
     /**
-     * print out the full matrix.
+     * @brief print out the full matrix.
+     * @param [in] elements_per_line: number of elements being printed per line.
+     *  Default is 5.
      */
-    void show_full() const;
+    void show_full(size_t elements_per_line = 5) const;
 
     /**
-     * print out the lower triangular matrix (not the restricted lower part).
+     * @brief Print out the lower triangular matrix (including diagonal
+     * elements).
+     * @param [in] elements_per_line: number of elements being printed per line.
+     *  Default is 5.
      */
-    void show_lower() const;
+    void show_lower(size_t elements_per_line = 5) const;
 
     /**
-     * calculate matrix trace.
+     * @brief Calculate matrix trace.
+     * @return double: the matrix trace.
      */
     double trace() const;
 
     /**
-     * Make the matrix to be symmetric.
+     * @brief Make the matrix to be symmetric.
      *
-     * @ param[in] uplo "U" using upper triangular part; "L" using lower triangular part.
-     * @ return *this the symmetrized matrix itself.
+     * @param[in] uplo: when \p uplo equals to "U", the upper triangular part is
+     * used. when \p uplo equals to "L", the lower triangular part is used.
+     * @return Matrix&: the symmetrized matrix itself.
      */
-    Matrix & to_symmetric(const string & uplo);
+    Matrix &to_symmetric(const string &uplo);
 
     /**
-     * Make the matrix to be random with elements uniformly distributed in range [a, b).
+     * @brief Make the matrix to be random with elements uniformly distributed
+     * in range [a, b).
      *
-     * THe random number generator is initialized with a non-fixed seed. So the randomness behavior
-     * is not repeatable at running time.
+     * @param [in] a: left range bound.
+     * @param [in] b: right range bound.
+     * @return Matrix&: the randomized matrix itself.
      *
-     * @ parameter a left range bound.
-     * @ parameter b right range bound.
-     * @ return *this the random matrix itself.
+     * @note The random number generator is initialized with a NON-FIXED seed.
+     * So the randomness behavior is not repeatable at running time.
      */
-    Matrix & randomize(double a, double b);
+    Matrix &randomize(double a, double b);
 
     /**
-     * Make the matrix to be random with elements uniformly distributed in range [a, b).
+     * @brief Make the matrix to be random with elements uniformly distributed
+     * in range [a, b).
      *
-     * THe random number generator is initialized with a fixed seed. So the randomness behavior
-     * is repeatable at running time.
+     * @param [in] a: left range bound.
+     * @param [in] b: right range bound.
+     * @return Matrix&: the randomized matrix itself.
      *
-     * @ parameter a left range bound.
-     * @ parameter b right range bound.
-     * @ return *this the random matrix itself.
+     * @note The random number generator is initialized with a FIXED seed. So
+     * the randomness behavior is repeatable at running time.
      */
-    Matrix & randomize_seed_fixed(double a, double b);
+    Matrix &randomize_seed_fixed(double a, double b);
 
     /**
-     * Scales current matrix by a constant. A = alpha * A.
-     *
-     * @ param[in] alpha the scalar coefficient.
-     * @ return *this the scaled matrix itself.
+     * @brief Scales current matrix by a constant.
+     * @details A = alpha * A.
+     * @param [in] alpha: the scalar coefficient.
+     * @return Matrix&: the scaled matrix itself.
      */
-    Matrix & scale(const double alpha);
+    Matrix &scale(const double alpha);
 
     /**
-     * fill all elements with input number.
-     *
-     * @ param[in] a the number to be filled.
-     * @ return *this the matrix itself.
+     * @brief Fill all elements with input number.
+     * @details For all matrix element A(i, i), make A(i, i) = \p a
+     * @param [in] a: the number to be filled.
+     * @return Matrix&: the matrix itself.
      */
-    Matrix & fill_all(double a);
+    Matrix &fill_all(double a);
 
     /**
-     * set matrix to be identity.
+     * @brief Set the matrix to be identity.
+     * @return Matrix&: the matrix itself.
      */
-    Matrix & set_identity();
-
+    Matrix &set_identity();
 };
 
-}   // namespace matrix
+} // namespace matrix
 
-#endif  // _MATRIX_SRC_MATRIX_H_
+#endif // _MATRIX_SRC_MATRIX_H_

@@ -1,25 +1,30 @@
+/**
+ * @file
+ * @brief definition of matrix library functions relate to functions in blas
+ * library.
+ */
 #include "matrix.h"
 
-#include <string>
 #include "blas.h"
 #include "blas_base.h"
 #include "exception.h"
+#include <string>
 
 namespace matrix {
 
 using std::string;
 
 /**
- * General matrix multiplication: C = alpha * A * B + beta * C.
+ * @brief General matrix multiplication: C = alpha * A * B + beta * C.
  *
- * @ param[in] alpha scalar coefficient on A * B.
- * @ param[in] A matrix A.
- * @ param[in] B matrix B.
- * @ param[in] beta scalar coefficient on matrix C.
- * @ param[out] C matrix C.
+ * @param [in] alpha: scalar coefficient on A * B.
+ * @param [in] A: matrix A.
+ * @param [in] B: matrix B.
+ * @param [in] beta: scalar coefficient on matrix C.
+ * @param [out] C: matrix C.
  */
-static int mult_dgemm_NN(double alpha, const Matrix & A, const Matrix & B,
-                         double beta, Matrix & C)
+static int mult_dgemm_NN(double alpha, const Matrix &A, const Matrix &B,
+                         double beta, Matrix &C)
 {
     // check dimension
     // A: M x N
@@ -32,31 +37,34 @@ static int mult_dgemm_NN(double alpha, const Matrix & A, const Matrix & B,
     // dimension check.
     if (N != B.row()) {
         // dimension check for A and B:
-        throw exception::DimensionError(A, B, "Error in matrix::mult_dgemm_NN(): dimension error between matrix A and B.");
+        throw exception::DimensionError(
+            A, B,
+            "Error in matrix::mult_dgemm_NN(): dimension error between matrix "
+            "A and B.");
     } else if (M != C.row() || K != C.col()) {
         // dimension check for AB and C:
-        throw exception::DimensionError("Error in matrix::mult_dgemm_NN(): dimension error between matrix (AB) and C.");
+        throw exception::DimensionError(
+            "Error in matrix::mult_dgemm_NN(): dimension error between matrix "
+            "(AB) and C.");
     }
-    // calculate (AB)^T=(B^T A^T) by dgemm to get (AB) stored in row-wise matrix.
-    blas::dgemm_("N", "N", &K, &M, &N,
-                 &alpha,
-                 B.data(), &K,
-                 A.data(), &N,
+    // calculate (AB)^T=(B^T A^T) by dgemm to get (AB) stored in row-wise
+    // matrix.
+    blas::dgemm_("N", "N", &K, &M, &N, &alpha, B.data(), &K, A.data(), &N,
                  &beta, C.data(), &K);
     return 0;
 }
 
 /**
- * General matrix multiplication: C = alpha * A^T * B^T + beta * C.
+ * @brief General matrix multiplication: C = alpha * A^T * B^T + beta * C.
  *
- * @ param[in] alpha scalar coefficient on A * B.
- * @ param[in] A matrix A.
- * @ param[in] B matrix B.
- * @ param[in] beta scalar coefficient on matrix C.
- * @ param[out] C matrix C.
+ * @param [in]  alpha:scalar coefficient on A * B.
+ * @param [in]  A: matrix A.
+ * @param [in]  B: matrix B.
+ * @param [in]  beta: scalar coefficient on matrix C.
+ * @param [out] C: matrix C.
  */
-static int mult_dgemm_TT(double alpha, const Matrix & A, const Matrix & B,
-                         double beta, Matrix & C)
+static int mult_dgemm_TT(double alpha, const Matrix &A, const Matrix &B,
+                         double beta, Matrix &C)
 {
     // check dimension
     // A: M x N
@@ -68,16 +76,18 @@ static int mult_dgemm_TT(double alpha, const Matrix & A, const Matrix & B,
     int K = B.row();
     if (M != B.col()) {
         // dimension check for A and B:
-        throw exception::DimensionError(A, B, "Error in matrix::mult_dgemm_TT(): dimension error between matrix A^T and B^T.");
+        throw exception::DimensionError(
+            A, B,
+            "Error in matrix::mult_dgemm_TT(): dimension error between matrix "
+            "A^T and B^T.");
     } else if (N != C.row() || K != C.col()) {
         // dimension check for AB and C:
-        throw exception::DimensionError("Error in matrix::mult_dgemm_TT(): dimension error between matrix (A^T B^T) and C.");
+        throw exception::DimensionError(
+            "Error in matrix::mult_dgemm_TT(): dimension error between matrix "
+            "(A^T B^T) and C.");
     }
     // calculate BA by dgemm to get (A^T B^T) stored in row-wise matrix.
-    blas::dgemm_("T", "T", &K, &N, &M,
-                 &alpha,
-                 B.data(), &M,
-                 A.data(), &N,
+    blas::dgemm_("T", "T", &K, &N, &M, &alpha, B.data(), &M, A.data(), &N,
                  &beta, C.data(), &K);
     return 0;
 }
@@ -91,8 +101,8 @@ static int mult_dgemm_TT(double alpha, const Matrix & A, const Matrix & B,
  * @ param[in] beta scalar coefficient on matrix C.
  * @ param[out] C matrix C.
  */
-static int mult_dgemm_NT(double alpha, const Matrix & A, const Matrix & B,
-                         double beta, Matrix & C)
+static int mult_dgemm_NT(double alpha, const Matrix &A, const Matrix &B,
+                         double beta, Matrix &C)
 {
     // check dimension
     // A: M x N
@@ -104,16 +114,18 @@ static int mult_dgemm_NT(double alpha, const Matrix & A, const Matrix & B,
     int K = B.row();
     if (N != B.col()) {
         // dimension check for A and B:
-        throw exception::DimensionError(A, B, "Error in matrix::mult_dgemm_NT(): dimension error between matrix A and B^T.");
+        throw exception::DimensionError(
+            A, B,
+            "Error in matrix::mult_dgemm_NT(): dimension error between matrix "
+            "A and B^T.");
     } else if (M != C.row() || K != C.col()) {
         // dimension check for AB and C:
-        throw exception::DimensionError("Error in matrix::mult_dgemm_NT(): dimension error between matrix (A B^T) and C.");
+        throw exception::DimensionError(
+            "Error in matrix::mult_dgemm_NT(): dimension error between matrix "
+            "(A B^T) and C.");
     }
     // calculate B A^T by dgemm to get (A B^T) stored in row-wise matrix.
-    blas::dgemm_("T", "N", &K, &M, &N,
-                 &alpha,
-                 B.data(), &N,
-                 A.data(), &N,
+    blas::dgemm_("T", "N", &K, &M, &N, &alpha, B.data(), &N, A.data(), &N,
                  &beta, C.data(), &K);
     return 0;
 }
@@ -127,8 +139,8 @@ static int mult_dgemm_NT(double alpha, const Matrix & A, const Matrix & B,
  * @ param[in] beta scalar coefficient on matrix C.
  * @ param[out] C matrix C.
  */
-static int mult_dgemm_TN(double alpha, const Matrix & A, const Matrix & B,
-                         double beta, Matrix & C)
+static int mult_dgemm_TN(double alpha, const Matrix &A, const Matrix &B,
+                         double beta, Matrix &C)
 {
     // A: M x N
     // B: M x K
@@ -139,41 +151,30 @@ static int mult_dgemm_TN(double alpha, const Matrix & A, const Matrix & B,
     int K = B.col();
     if (M != B.row()) {
         // dimension check for A and B:
-        throw exception::DimensionError(A, B, "Error in matrix::mult_dgemm_TN(): dimension error between matrix A^T and B.");
+        throw exception::DimensionError(
+            A, B,
+            "Error in matrix::mult_dgemm_TN(): dimension error between matrix "
+            "A^T and B.");
     } else if (N != C.row() || K != C.col()) {
         // dimension check for AB and C:
-        throw exception::DimensionError("Error in matrix::mult_dgemm_TN(): dimension error between matrix (A^T B) and C.");
+        throw exception::DimensionError(
+            "Error in matrix::mult_dgemm_TN(): dimension error between matrix "
+            "(A^T B) and C.");
     }
     // calculate B^T A by dgemm to get (A B^T) stored in row-wise matrix.
-    blas::dgemm_("N", "T", &K, &N, &M,
-                 &alpha,
-                 B.data(), &K,
-                 A.data(), &N,
+    blas::dgemm_("N", "T", &K, &N, &M, &alpha, B.data(), &K, A.data(), &N,
                  &beta, C.data(), &K);
     return 0;
 }
 
-/**
- * wrapper of blas dgemm function for general matrix multiplication.
- *
- * calculate C = alpha * op(A) * op(B) + beta * C.
- * op(A) represents the matrix with an operation acted on it.
- * op(A) = A or op(A) = A^T.
- *
- * @ param[in] alpha scalar coefficient on op(A) * op(B).
- * @ param[in] A matrix view that represents op(A).
- * @ param[in] op_A operation acting on matrix A.
- * @ param[in] B matrix view that represents op(B).
- * @ param[in] op_B operation acting on matrix B.
- * @ param[in] beta scalar coefficient on matrix C.
- * @ param[out] C matrix C.
- */
-int mult_dgemm(const double alpha, const Matrix & A, const string & op_A,
-               const Matrix & B, const string & op_B, const double beta,
-               Matrix & C)
+int mult_dgemm(const double alpha, const Matrix &A, const string &op_A,
+               const Matrix &B, const string &op_B, const double beta,
+               Matrix &C)
 {
     if (&C == &A || &C == &B) {
-        throw exception::MatrixException("Error in matrix::mult_dgemm(): output matrix cannot be one of the input matrix.");
+        throw exception::MatrixException(
+            "Error in matrix::mult_dgemm(): output matrix cannot be one of the "
+            "input matrix.");
     }
     if (op_A == "N" && op_B == "N") {
         return mult_dgemm_NN(alpha, A, B, beta, C);
@@ -184,35 +185,30 @@ int mult_dgemm(const double alpha, const Matrix & A, const string & op_A,
     } else if (op_A == "T" && op_B == "T") {
         return mult_dgemm_TT(alpha, A, B, beta, C);
     } else {
-        throw exception::MatrixException("Error in matrix::mult_dgemm(): unknown operation on matrix. op_A=" + op_A + ", op_B=" + op_B);
+        throw exception::MatrixException("Error in matrix::mult_dgemm(): "
+                                         "unknown operation on matrix. op_A=" +
+                                         op_A + ", op_B=" + op_B);
     }
 }
 
-/**
- * calculate C = A * B * A^T.
- */
 int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C)
 {
     if (&C == &A || &C == &B) {
-        throw exception::MatrixException("Error in matrix::mult_dgemm_ABAT(): output matrix is one of the input matrix.");
+        throw exception::MatrixException(
+            "Error in matrix::mult_dgemm_ABAT(): output matrix is one of the "
+            "input matrix.");
     }
     Matrix AB(A.row(), B.col());
     mult_dgemm(1.0, A, "N", B, "N", 0.0, AB);
     mult_dgemm(1.0, AB, "N", A, "T", 0.0, C);
 }
 
-/**
- * scale a matrix to another matrix by a constant.
- *
- * @ param[in] alpha the scalar coefficient.
- * @ param[in] A the matrix use for scaling.
- * @ param[out] B the scaled matrix.
- * @ return int 0 for success others for failure.
- */
-int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B)
+int mult_dscal_to(const double alpha, const Matrix &A, Matrix &B)
 {
     if (A.row() != B.row() || A.col() != B.col()) {
-        throw exception::DimensionError(A, B, "Error in matrix::mult_dscal_to(), matrix dimension mismatched.");
+        throw exception::DimensionError(
+            A, B,
+            "Error in matrix::mult_dscal_to(), matrix dimension mismatched.");
     }
     if (alpha == 1.0) {
         B = A;
@@ -235,4 +231,4 @@ int mult_dscal_to(const double alpha, const Matrix & A, Matrix & B)
     return 0;
 }
 
-}   // namespace matrix
+} // namespace matrix

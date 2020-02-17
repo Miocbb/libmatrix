@@ -1,13 +1,13 @@
 /**
- * file: matrix.hpp
+ * @file
  *
- * Header file to be included to use this library.
+ * @brief The only header file to include to use the matrix library.
  *
- * The purpose of this library is to let the usage of blas/lapack library
- * for matrice in an easier way.
+ * @details The purpose of this library is to let the usage of blas/lapack library
+ *  for matrice in an easier way.
  *
- * Matrix storage format: column-wise full storage.
- * Matrix index: index starts from zero.
+ * @note Matrix storage format is always the column-wise full storage.
+ * @note Matrix index always starts from zero.
  */
 #ifndef _MATRIX_INCLUDE_MATRIX_MATRIX_H_
 #define _MATRIX_INCLUDE_MATRIX_MATRIX_H_
