@@ -8,6 +8,7 @@
 #include "matrix.h"
 #include <assert.h>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <unistd.h>
@@ -64,28 +65,31 @@ void read_matrices_from_binary(vector<std::shared_ptr<Matrix>> &Mat,
 std::vector<std::shared_ptr<Matrix>>
 read_matrices_from_binary(const char *fname)
 {
-    if (fname == NULL) {
-        throw exception::MatrixIOException(fname, "No file name.");
-    } else if (access(fname, R_OK) != 0) {
-        throw exception::MatrixIOException(fname, "No readding access.");
+    std::vector<std::shared_ptr<Matrix>> rst;
+    std::fstream fin(fname, std::ios::in | std::ios::binary);
+    if (!fin) {
+        throw exception::MatrixIOException(fname,
+                                           "Cannot read matrix binary file.");
     }
 
-    std::vector<std::shared_ptr<Matrix>> rst;
-    FILE *f = fopen(fname, "rb");
-    while (!feof(f)) {
-        size_t read_row = 0;
-        size_t read_col = 0;
-        fread(&read_row, sizeof(read_row), 1, f);
-        fread(&read_col, sizeof(read_col), 1, f);
-
+    size_t read_row = 0;
+    size_t read_col = 0;
+    while (fin.read(reinterpret_cast<char *>(&read_row), sizeof(read_row)) &&
+           fin.read(reinterpret_cast<char *>(&read_col), sizeof(read_row))) {
         auto mat = std::make_shared<Matrix>(read_row, read_col);
-        fread(mat->data(), sizeof(double), read_row * read_col, f);
+        // use fstream::operator bool() function to check if read is successful.
+        if (!(fin.read(reinterpret_cast<char *>(mat->data()),
+                       sizeof(double) * read_row * read_col))) {
+            throw exception::MatrixIOException(
+                fname,
+                "Fail to read matrix binary file, detect unmatched size.");
+        }
         rst.push_back(mat);
     }
-    fclose(f);
+    fin.close();
 
     return rst;
-}
+} // namespace matrix
 
 std::vector<std::shared_ptr<Matrix>> read_matrices_from_binary(string &fname)
 {
@@ -206,10 +210,10 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
             } catch (...) {
                 std::stringstream msg;
                 msg << "Failed to read matrix element at line:" << line_num + 1
-                    << ", column:" << p_data - line_split.begin() + 1 << std::endl;
+                    << ", column:" << p_data - line_split.begin() + 1
+                    << std::endl;
                 msg << "Failed element value: " << *p_data << std::endl;
-                throw exception::MatrixIOException(
-                    fname, msg.str());
+                throw exception::MatrixIOException(fname, msg.str());
             }
         }
         // at this point, the first line has been parsed.
