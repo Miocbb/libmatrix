@@ -12,3 +12,6 @@ extern*/
 
 # doxygen
 **/doxygen*/
+
+# tem file
+**/*.tem
