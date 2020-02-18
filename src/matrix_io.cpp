@@ -166,6 +166,7 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
     std::size_t count = 0;
 
     // loop over each line in the txt file
+    std::size_t line_num = 0;
     while (std::getline(fin, line)) {
         str_split(line, ',', line_split);
         auto p_data = line_split.begin();
@@ -200,15 +201,20 @@ std::vector<std::shared_ptr<Matrix>> read_matrices_from_txt(const string &fname)
         // put matrix element in current line into the matrix object.
         for (; p_data != line_split.end(); ++p_data) {
             try {
-                current_matrix->data()[count] = std::stof(*p_data);
+                current_matrix->data()[count] = std::stod(*p_data);
                 ++count;
             } catch (...) {
+                std::stringstream msg;
+                msg << "Failed to read matrix element at line:" << line_num + 1
+                    << ", column:" << p_data - line_split.begin() + 1 << std::endl;
+                msg << "Failed element value: " << *p_data << std::endl;
                 throw exception::MatrixIOException(
-                    fname, "Failed to read matrix element.");
+                    fname, msg.str());
             }
         }
         // at this point, the first line has been parsed.
         is_first_line = false;
+        line_num++;
     }
     fin.close();
     return rst;
