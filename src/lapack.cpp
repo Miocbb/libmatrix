@@ -7,6 +7,7 @@
 #include "exception.h"
 #include "lapack_base.h"
 #include "matrix.h"
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -24,26 +25,26 @@ int set_matrix_random_orthogonal(Matrix &Q, bool using_fixed_seed)
     }
 
     // first generate a random matrix.
-    if (using_fixed_seed) {
+    if (using_fixed_seed)
         Q.randomize_seed_fixed(0, 1);
-    } else {
+    else
         Q.randomize(0, 1);
-    }
 
     // QR factorization to get Q matrix.
     int n = Q.col();
-    int *jpvt = new int[n];
-    double *tau = new double[n];
-    double work_opt = 0;
     int lwork = -1;
-    double *work = nullptr;
     int info = 0;
+    double work_opt = 0;
+    vector<int> jpvt(n);
+    vector<double> tau(n);
     // query work space.
-    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt, tau, &work_opt, &lwork, &info);
+    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt.data(), tau.data(), &work_opt,
+                    &lwork, &info);
     lwork = (int)work_opt;
-    work = new double[lwork];
+    vector<double> work(lwork);
     // do qr factorization.
-    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt, tau, work, &lwork, &info);
+    lapack::dgeqp3_(&n, &n, Q.data(), &n, jpvt.data(), tau.data(), work.data(),
+                    &lwork, &info);
     if (info < 0) {
         std::stringstream msg;
         msg << "QR factorization failed. "
@@ -51,17 +52,14 @@ int set_matrix_random_orthogonal(Matrix &Q, bool using_fixed_seed)
         throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
     // retrieve Q matrix from dgeqp3
-    lapack::dorgqr_(&n, &n, &n, Q.data(), &n, tau, work, &lwork, &info);
+    lapack::dorgqr_(&n, &n, &n, Q.data(), &n, tau.data(), work.data(), &lwork,
+                    &info);
     if (info < 0) {
         std::stringstream msg;
         msg << "Retrieve Q matrix failed. "
             << "The " << -info << "-th argument had an illegal value\n";
         throw matrix::exception::MatrixOperationError(__FUNCTION__, msg.str());
     }
-
-    delete[] jpvt;
-    delete[] tau;
-    delete[] work;
 
     return 0;
 }
@@ -94,25 +92,22 @@ int diagonalize_sym_matrix_dsyev(const string &uplo, Matrix &A,
     int n = row;
     int lda = row;
     int info = 0;
-    int lwork = -1;
     double wkopt = 0.0;
-    double *w = eig.data();
-    double *a = A.data();
     // Query and allocate the optimal workspace
-    matrix::lapack::dsyev_("V", used_uplo.c_str(), &n, a, &lda, w, &wkopt,
-                           &lwork, &info);
+    int lwork = -1;
+    lapack::dsyev_("V", used_uplo.c_str(), &n, A.data(), &lda, eig.data(),
+                   &wkopt, &lwork, &info);
     lwork = (int)wkopt;
-    double *work = new double[lwork];
+    vector<double> work(lwork);
 
-    // Solve eigenproblem
-    matrix::lapack::dsyev_("V", used_uplo.c_str(), &n, a, &lda, w, work, &lwork,
-                           &info);
-    delete[] work;
+    // Solve eigenvalue decomposition.
+    lapack::dsyev_("V", used_uplo.c_str(), &n, A.data(), &lda, eig.data(),
+                   work.data(), &lwork, &info);
 
     // Check exit status
     if (info > 0) {
-        throw matrix::exception::MatrixOperationError(__FUNCTION__,
-                                                      "convergence failure");
+        throw exception::MatrixOperationError(__FUNCTION__,
+                                              "convergence failure");
     } else if (info < 0) {
         std::stringstream msg;
         msg << "Fail to diagonalize a symmetric matrix: "
@@ -134,15 +129,11 @@ int invert_gen_matrix_dgetri(Matrix &A)
 
     int n = A.row();
     int lwork = n;
-    double *work = nullptr;
-    work = new double[lwork];
-    int *ipiv = nullptr;
     int info = 0;
-    ipiv = new int[n];
-    lapack::dgetrf_(&n, &n, A.data(), &n, ipiv, &info);
-    lapack::dgetri_(&n, A.data(), &n, ipiv, work, &lwork, &info);
-    delete[] work;
-    delete[] ipiv;
+    vector<double> work(lwork);
+    vector<int> ipiv(n);
+    lapack::dgetrf_(&n, &n, A.data(), &n, ipiv.data(), &info);
+    lapack::dgetri_(&n, A.data(), &n, ipiv.data(), work.data(), &lwork, &info);
 
     if (info < 0) {
         std::stringstream msg;
@@ -221,23 +212,20 @@ int invert_sym_matrix_dsytri(const string &uplo, Matrix &A)
     }
 
     int n = A.row();
-    int lwork = 0;
-    double workopt = 0;
-    double *work = nullptr;
-    int *ipiv = new int[n];
     int info = 0;
-    lwork = -1;
+    double workopt = 0;
+    vector<int> ipiv(n);
     // query and allocate the optimal workspace.
-    lapack::dsytrf_(used_uplo.c_str(), &n, A.data(), &n, ipiv, &workopt, &lwork,
-                    &info);
+    int lwork = -1;
+    lapack::dsytrf_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(), &workopt,
+                    &lwork, &info);
     lwork = (int)workopt;
-    work = new double[lwork];
+    vector<double> work(lwork);
     // call LAPACK to invert the matrix
-    lapack::dsytrf_(used_uplo.c_str(), &n, A.data(), &n, ipiv, work, &lwork,
-                    &info);
-    lapack::dsytri_(used_uplo.c_str(), &n, A.data(), &n, ipiv, work, &info);
-    delete[] work;
-    delete[] ipiv;
+    lapack::dsytrf_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(),
+                    work.data(), &lwork, &info);
+    lapack::dsytri_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(),
+                    work.data(), &info);
     if (info < 0) {
         std::stringstream msg;
         msg << "The " << -info << "-th arguments had an illegal value.";
@@ -273,24 +261,20 @@ int invert_sym_matrix_dsytri_rook(const string &uplo, Matrix &A)
     }
 
     int n = A.row();
-    int lwork = 0;
-    double workopt = 0;
-    double *work = nullptr;
-    int *ipiv = new int[n];
     int info = 0;
-    lwork = -1;
+    double workopt = 0;
+    vector<int> ipiv(n);
     // query and allocate the optimal workspace.
-    lapack::dsytrf_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv, &workopt,
-                         &lwork, &info);
+    int lwork = -1;
+    lapack::dsytrf_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(),
+                         &workopt, &lwork, &info);
     lwork = (int)workopt;
-    work = new double[lwork];
+    vector<double> work(lwork);
     // call LAPACK to invert the matrix
-    lapack::dsytrf_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv, work,
-                         &lwork, &info);
-    lapack::dsytri_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv, work,
-                         &info);
-    delete[] work;
-    delete[] ipiv;
+    lapack::dsytrf_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(),
+                         work.data(), &lwork, &info);
+    lapack::dsytri_rook_(used_uplo.c_str(), &n, A.data(), &n, ipiv.data(),
+                         work.data(), &info);
     if (info < 0) {
         std::stringstream msg;
         msg << "The " << -info << "-th arguments had an illegal value.";
