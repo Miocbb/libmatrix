@@ -31,7 +31,7 @@ TEST(DiagonalizeSymmetricMatrixTest, dsyev_test)
     for (size_t i = 0; i < 2; i++) {
         EXPECT_DOUBLE_EQ(A_eigval[i], A_diag[i]);
     }
-    A_eigvec.show_full();
+    //A_eigvec.show_full();
     EXPECT_TRUE(A_eigvec.is_identity());     // eigenvector matrix should be identity.
     // test lower triangular.
     A_eigvec = A;

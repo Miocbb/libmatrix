@@ -191,6 +191,10 @@ int mult_dgemm(const double alpha, const Matrix &A, const string &op_A,
     }
 }
 
+/**
+ * @note It will throw an exception when the output matrix `C` is either `A` or
+ * `B` matrix.
+ */
 int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C)
 {
     if (&C == &A || &C == &B) {
@@ -201,6 +205,22 @@ int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C)
     Matrix AB(A.row(), B.col());
     mult_dgemm(1.0, A, "N", B, "N", 0.0, AB);
     mult_dgemm(1.0, AB, "N", A, "T", 0.0, C);
+}
+
+/**
+ * @note It will throw an exception when the output matrix `C` is either `A` or
+ * `B` matrix.
+ */
+int mult_dgemm_ATBA(const Matrix &A, const Matrix &B, Matrix &C)
+{
+    if (&C == &A || &C == &B) {
+        throw exception::MatrixException(
+            "Error in matrix::mult_dgemm_ATBA(): output matrix is one of the "
+            "input matrix.");
+    }
+    Matrix AB(A.col(), B.col());
+    mult_dgemm(1.0, A, "T", B, "N", 0.0, AB);
+    mult_dgemm(1.0, AB, "N", A, "N", 0.0, C);
 }
 
 int mult_dscal_to(const double alpha, const Matrix &A, Matrix &B)

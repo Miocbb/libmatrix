@@ -46,6 +46,18 @@ int mult_dgemm(const double alpha, const Matrix &A, const string &op_A,
 int mult_dgemm_ABAT(const Matrix &A, const Matrix &B, Matrix &C);
 
 /**
+ * @brief convenient function wrapper for three general matrix multiplication.
+ *
+ * @par Purpose
+ * calculate C = A^T * B * A.
+ *
+ * @param [in] A: matrix A.
+ * @param [in] B: matrix B.
+ * @param [in] C: matrix C.
+ */
+int mult_dgemm_ATBA(const Matrix &A, const Matrix &B, Matrix &C);
+
+/**
  * @brief wrapper of blas dscal function to scale matrix by a constant.
  *
  * @par Purpose
