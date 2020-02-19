@@ -78,7 +78,8 @@ class Matrix {
      * inp_data. If \p copy_type equals to matrix::Matrix::kDeepCopy, all the
      * data will be copied into matrix. If the \p copy type equals to
      * matrix::Matrix::kShallowCopy, the pointer to the data memory is assigned
-     * to the matrix and the matrix gains the access to the data.
+     * to the matrix and the matrix gains the access to the data. Default is
+     * deep copy.
      *
      * @note The data size of the vector will be check to match the matrix size.
      * @note This constructor is not const friendly. If you want to do a shallow
@@ -94,7 +95,7 @@ class Matrix {
      * data.
      */
     Matrix(size_t row, size_t col, vector<double> &inp_data,
-           CopyType copy_type);
+           CopyType copy_type = kDeepCopy);
 
     /**
      * @brief Construct a matrix from a double array pointer.
@@ -104,7 +105,7 @@ class Matrix {
      * @param [in] copy_type: If \p copy_type equals matrix::Matrix::kDeepCopy,
      * all the data will be copied into matrix. If the \p copy_type equals to
      * matrix::Matrix::kShallowCopy, the pointer \p inp_data_ptr is stored in
-     * the matrix to gain the access to matrix data.
+     * the matrix to gain the access to matrix data. Default is deep copy.
      *
      * @note The data size of the array will NOT be check to match the matrix
      * size. Use this constructor carefully.
@@ -118,7 +119,8 @@ class Matrix {
      * ```
      * This can preserve the created matrix not change the original array data.
      */
-    Matrix(size_t row, size_t col, double *inp_data_ptr, CopyType copy_type);
+    Matrix(size_t row, size_t col, double *inp_data_ptr,
+           CopyType copy_type = kDeepCopy);
 
     /**
      * @brief Default constructor.
@@ -411,6 +413,11 @@ class Matrix {
      * @return Matrix&: the matrix itself.
      */
     Matrix &set_identity();
+
+    /**
+     * @brief transpose the matrix.
+     */
+    void transpose();
 };
 
 } // namespace matrix

@@ -327,4 +327,26 @@ Matrix &Matrix::set_identity()
     }
 }
 
+void Matrix::transpose()
+{
+    Matrix &A = *this;
+    if (A.is_square()) {
+        for (size_t i = 0; i < A.row(); ++i) {
+            for (size_t j = 0; j < i; ++j) {
+                double t = A(i, j);
+                A(i, j) = A(j, i);
+                A(j, i) = t;
+            }
+        }
+    } else {
+        Matrix T(A.col(), A.row());
+        for (size_t i = 0; i < T.row(); ++i) {
+            for (size_t j = 0; j < T.col(); ++j) {
+                T(i, j) = A(j, i);
+            }
+        }
+        A = T;
+    }
+}
+
 } // namespace matrix
