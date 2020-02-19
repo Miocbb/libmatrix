@@ -248,7 +248,35 @@ double Matrix::trace() const
     return rst;
 }
 
-Matrix &Matrix::to_symmetric(const string &uplo)
+/**
+ * @note If the data is stored out side of the matrix object and not managed by
+ * this matrix object, data will be copied into the matrix and managed by the matrix
+ * object after the call. Trancation or appending zeros will be performed during
+ * the copy process when the new matrix size is less or greater than the original
+ * matrix size.
+ */
+void Matrix::resize(size_t row, size_t col)
+{
+    size_t new_size = row * col;
+    // this has to be called before resize memory block.
+    auto is_data_outside = this->is_data_stored_outside();
+    // update memory block.
+    data_vec_.reserve(new_size);
+    data_vec_.resize(new_size, 0);
+    data_vec_.shrink_to_fit();
+    if (is_data_outside) {
+        size_t n = (new_size <= this->size() ? new_size : this->size());
+        for (size_t i = 0; i < n; ++i)
+            data_vec_[i] = data_ptr_[i];
+    }
+    // updata matrix information
+    row_ = row;
+    col_ = col;
+    size_ = row * col;
+    data_ptr_ = data_vec_.data();
+}
+
+void Matrix::to_symmetric(const string &uplo)
 {
     if (row_ != col_) {
         throw exception::DimensionError(
@@ -267,10 +295,9 @@ Matrix &Matrix::to_symmetric(const string &uplo)
             }
         }
     }
-    return *this;
 }
 
-Matrix &Matrix::randomize(double a, double b)
+void Matrix::randomize(double a, double b)
 {
     std::random_device
         rd; // Will be used to obtain a seed for the random number engine
@@ -281,10 +308,9 @@ Matrix &Matrix::randomize(double a, double b)
             (*this)(i, j) = dis(gen);
         }
     }
-    return *this;
 }
 
-Matrix &Matrix::randomize_seed_fixed(double a, double b)
+void Matrix::randomize_seed_fixed(double a, double b)
 {
     std::uniform_real_distribution<> dis(a, b);
     for (size_t i = 0; i < this->row(); i++) {
@@ -292,17 +318,15 @@ Matrix &Matrix::randomize_seed_fixed(double a, double b)
             (*this)(i, j) = dis(g_rand_generator_mt19937_seed_fixed);
         }
     }
-    return *this;
 }
 
-Matrix &Matrix::scale(const double alpha)
+void Matrix::scale(const double alpha)
 {
     int size = size_;
     blas::dscal_(&size, &alpha, this->data(), blas::ione);
-    return *this;
 }
 
-Matrix &Matrix::fill_all(double a)
+void Matrix::fill_all(double a)
 {
 #ifdef USE_OPENMP
 #pragma omp parallel for
@@ -312,7 +336,7 @@ Matrix &Matrix::fill_all(double a)
     }
 }
 
-Matrix &Matrix::set_identity()
+void Matrix::set_identity()
 {
     if (!this->is_square()) {
         throw exception::DimensionError(

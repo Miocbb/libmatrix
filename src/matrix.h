@@ -358,13 +358,26 @@ class Matrix {
     double trace() const;
 
     /**
+     * @brief Resize the matrix into given dimension.
+     * @details Matrix data value is perserved. The order of data stored in
+     * memory is preserved as well, so you will need to re-interprate the new
+     * matrix based on the new size.
+     *
+     * When new matrix size is greater than the original matrix size,
+     * zeros will be appended to the end.
+     *
+     * @param [in] row: new number of rows.
+     * @param [in] col: new number of columns.
+     */
+    void resize(size_t row, size_t col);
+
+    /**
      * @brief Make the matrix to be symmetric.
      *
      * @param[in] uplo: when \p uplo equals to "U", the upper triangular part is
      * used. when \p uplo equals to "L", the lower triangular part is used.
-     * @return Matrix&: the symmetrized matrix itself.
      */
-    Matrix &to_symmetric(const string &uplo);
+    void to_symmetric(const string &uplo);
 
     /**
      * @brief Make the matrix to be random with elements uniformly distributed
@@ -372,12 +385,11 @@ class Matrix {
      *
      * @param [in] a: left range bound.
      * @param [in] b: right range bound.
-     * @return Matrix&: the randomized matrix itself.
      *
      * @note The random number generator is initialized with a NON-FIXED seed.
      * So the randomness behavior is not repeatable at running time.
      */
-    Matrix &randomize(double a, double b);
+    void randomize(double a, double b);
 
     /**
      * @brief Make the matrix to be random with elements uniformly distributed
@@ -385,37 +397,33 @@ class Matrix {
      *
      * @param [in] a: left range bound.
      * @param [in] b: right range bound.
-     * @return Matrix&: the randomized matrix itself.
      *
      * @note The random number generator is initialized with a FIXED seed. So
      * the randomness behavior is repeatable at running time.
      */
-    Matrix &randomize_seed_fixed(double a, double b);
+    void randomize_seed_fixed(double a, double b);
 
     /**
      * @brief Scales current matrix by a constant.
      * @details A = alpha * A.
      * @param [in] alpha: the scalar coefficient.
-     * @return Matrix&: the scaled matrix itself.
      */
-    Matrix &scale(const double alpha);
+    void scale(const double alpha);
 
     /**
      * @brief Fill all elements with input number.
      * @details For all matrix element A(i, i), make A(i, i) = \p a
      * @param [in] a: the number to be filled.
-     * @return Matrix&: the matrix itself.
      */
-    Matrix &fill_all(double a);
+    void fill_all(double a);
 
     /**
      * @brief Set the matrix to be identity.
-     * @return Matrix&: the matrix itself.
      */
-    Matrix &set_identity();
+    void set_identity();
 
     /**
-     * @brief transpose the matrix.
+     * @brief Set the matrix to be its transpose.
      */
     void transpose();
 };

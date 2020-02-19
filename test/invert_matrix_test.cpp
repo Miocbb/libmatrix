@@ -21,12 +21,15 @@ struct InvertTest: public ::testing::Test {
 
     virtual void SetUp() override
     {
-        A22_gen_mat = Matrix(2, 2).randomize(0, 1);
+        A22_gen_mat.resize(2, 2);
+        A22_gen_mat.randomize(0, 1);
         MatrixXd A22_gen_mxd = Matrix_to_MatrixXd(A22_gen_mat);
         MatrixXd A22_gen_inv_mxd = A22_gen_mxd.inverse();
         A22_gen_inv_mat = MatrixXd_to_Matrix(A22_gen_inv_mxd);
 
-        A22_sym_mat = Matrix(2, 2).randomize(0, 1).to_symmetric("L");
+        A22_sym_mat.resize(2, 2);
+        A22_sym_mat.randomize(0, 1);
+        A22_sym_mat.to_symmetric("L");
         MatrixXd A22_sym_mxd = Matrix_to_MatrixXd(A22_sym_mat);
         MatrixXd A22_sym_inv_mxd = A22_sym_mxd.inverse();
         A22_sym_inv_mat = MatrixXd_to_Matrix(A22_sym_inv_mxd);

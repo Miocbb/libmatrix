@@ -34,11 +34,14 @@ struct DgemmTest: public ::testing::Test {
 
     virtual void SetUp() override
     {
-        A22_gen_m = Matrix(2, 2).randomize(0, 1);
-        A23_gen_m = Matrix(2, 3).randomize(0, 1);
-        A32_gen_m = Matrix(3, 2).randomize(0, 1);
-        A33_gen_m = Matrix(3, 3).randomize(0, 1);
-        A100_m = Matrix(100, 100).randomize(0, 100);
+        A22_gen_m.resize(2, 2);
+        A22_gen_m.randomize(0, 1);
+        A23_gen_m.resize(2, 3);
+        A23_gen_m.randomize(0, 1);
+        A32_gen_m.resize(3, 2);
+        A32_gen_m.randomize(0, 1);
+        A100_m.resize(100, 100);
+        A100_m.randomize(0, 100);
 
         A22_gen_mxd = Matrix_to_MatrixXd(A22_gen_m);
         A23_gen_mxd = Matrix_to_MatrixXd(A23_gen_m);
