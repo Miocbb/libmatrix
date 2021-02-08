@@ -1,35 +1,32 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(project_name matrix_test)
-project(${project_name} C CXX)
+set(PROJECT_MATRIX_TEST matrix_test)
+project(${PROJECT_MATRIX_TEST} C CXX)
 
 find_package (Eigen3 REQUIRED NO_MODULE)
 if(Eigen3_FOUND)
     message(STATUS "Eigen3 library found.")
 else()
-    message(WARNING "Can not found library Eigen3, which will be used for testing.\
+    message(FETAL_ERROR "Can not found library Eigen3, which will be used for testing.\
         Test code will be skipped until Eigen3 is installed.")
     return()
 endif()
 
-file(GLOB Sources
+file(GLOB PROJECT_SOURCES
     "*.cpp"
     "*.cc")
-file(GLOB Headers
-    "*.hpp"
-    "*.h")
 
 add_executable(
-    ${project_name}
-    ${Sources}
-    ${Headers})
+    ${PROJECT_MATRIX_TEST}
+    ${PROJECT_SOURCES})
 
 target_link_libraries(
-    ${project_name} PUBLIC
-    matrix
+    ${PROJECT_MATRIX_TEST}
+    PUBLIC
+    ${PROJECT_MATRIX}
     gtest_main
     Eigen3::Eigen)
 
 add_test(
-    NAME ${project_name}
-    COMMAND ${project_name})
+    NAME ${PROJECT_MATRIX_TEST}
+    COMMAND ${PROJECT_MATRIX_TEST})
