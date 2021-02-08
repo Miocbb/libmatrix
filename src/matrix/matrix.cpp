@@ -1,15 +1,10 @@
-/**
- * @file
- * @brief Definition matrix class.
- */
-
-#include "matrix.h"
+#include <cmath>
+#include <matrix/details/comma_initialize.h>
+#include <matrix/details/exception.h>
+#include <matrix/details/matrix.h>
+#include <random>
 
 #include "blas_base.h"
-#include "comma_initialize.h"
-#include "exception.h"
-#include <cmath>
-#include <random>
 
 namespace matrix {
 
@@ -250,10 +245,10 @@ double Matrix::trace() const
 
 /**
  * @note If the data is stored out side of the matrix object and not managed by
- * this matrix object, data will be copied into the matrix and managed by the matrix
- * object after the call. Trancation or appending zeros will be performed during
- * the copy process when the new matrix size is less or greater than the original
- * matrix size.
+ * this matrix object, data will be copied into the matrix and managed by the
+ * matrix object after the call. Trancation or appending zeros will be performed
+ * during the copy process when the new matrix size is less or greater than the
+ * original matrix size.
  */
 void Matrix::resize(size_t row, size_t col)
 {

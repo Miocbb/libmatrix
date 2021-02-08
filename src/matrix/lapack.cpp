@@ -1,15 +1,11 @@
-/**
- * @file
- * @brief definition of matrix library functions relate to lapack function.
- */
-#include "lapack.h"
-
-#include "exception.h"
-#include "lapack_base.h"
-#include "matrix.h"
+#include <matrix/details/exception.h>
+#include <matrix/details/lapack.h>
+#include <matrix/details/matrix.h>
 #include <memory>
 #include <sstream>
 #include <string>
+
+#include "lapack_base.h"
 
 namespace matrix {
 

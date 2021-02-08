@@ -1,9 +1,9 @@
 /**
- * @file
+ * @file matrix_io.h
  * @brief declarations relate to matrix I/O.
  */
-#ifndef _MATRIX_SRC_MATRIX_IO_H_
-#define _MATRIX_SRC_MATRIX_IO_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_MATRIX_IO_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_MATRIX_IO_H_
 
 #include "matrix.h"
 #include <memory>

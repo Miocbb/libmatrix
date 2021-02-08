@@ -1,14 +1,9 @@
-/**
- * @file
- * @brief definition relates to matrix I/O.
- */
-#include "matrix_io.h"
-
-#include "exception.h"
-#include "matrix.h"
 #include <assert.h>
 #include <fstream>
 #include <iostream>
+#include <matrix/details/exception.h>
+#include <matrix/details/matrix.h>
+#include <matrix/details/matrix_io.h>
 #include <sstream>
 #include <stdio.h>
 #include <unistd.h>

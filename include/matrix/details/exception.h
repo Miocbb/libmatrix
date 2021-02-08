@@ -1,9 +1,9 @@
 /**
- * @file
+ * @file exception.h
  * @brief declaration relate exceptions used in matrix library.
  */
-#ifndef _MATRIX_SRC_EXCEPTION_H_
-#define _MATRIX_SRC_EXCEPTION_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_EXCEPTION_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_EXCEPTION_H_
 
 #include "matrix.h"
 #include <sstream> // std::stringstream

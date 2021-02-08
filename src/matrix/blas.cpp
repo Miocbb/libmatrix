@@ -1,14 +1,9 @@
-/**
- * @file
- * @brief definition of matrix library functions relate to functions in blas
- * library.
- */
-#include "matrix.h"
-
-#include "blas.h"
-#include "blas_base.h"
-#include "exception.h"
+#include <matrix/details/blas.h>
+#include <matrix/details/exception.h>
+#include <matrix/details/matrix.h>
 #include <string>
+
+#include "blas_base.h"
 
 namespace matrix {
 

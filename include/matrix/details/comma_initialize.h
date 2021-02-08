@@ -1,12 +1,12 @@
 /**
- * @file
+ * @file comma_initialize.h
  * @brief comma initialization like Eigen library.
  */
-#ifndef _MATRIX_SRC_COMMA_INITIALIZE_H_
-#define _MATRIX_SRC_COMMA_INITIALIZE_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_COMMA_INITIALIZE_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_COMMA_INITIALIZE_H_
 
-#include "exception.h"
 #include "matrix.h"
+#include "exception.h"
 #include <string>
 
 namespace matrix {

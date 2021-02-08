@@ -1,11 +1,11 @@
 /**
- * @file
+ * @file blas.h
  * @brief declaration of matrix library functions relate to functions in blas
  * library.
  */
 
-#ifndef _MATRIX_SRC_BLAS_H_
-#define _MATRIX_SRC_BLAS_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_BLAS_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_BLAS_H_
 
 #include "matrix.h"
 

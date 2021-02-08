@@ -1,10 +1,10 @@
 /**
- * @file
+ * @file matrix.h
  * @brief Decleration matrix class.
  */
 
-#ifndef _MATRIX_SRC_MATRIX_H_
-#define _MATRIX_SRC_MATRIX_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_MATRIX_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_MATRIX_H_
 
 #include <cstddef>
 #include <initializer_list>

@@ -1,11 +1,4 @@
-/**
- * @file
- * @brief definition relates to exceptions used in matrix library.
- */
-#ifndef _MATRIX_SRC_EXCEPTION_H_
-#include "exception.h"
-
-#include <sstream> // std::stringstream
+#include <matrix/details/exception.h>
 
 namespace matrix {
 namespace exception {
@@ -18,5 +11,3 @@ void MatrixException::make_message(const char *msg)
 
 } // namespace exception
 } // namespace matrix
-
-#endif // _MATRIX_SRC_EXCEPTION_H_

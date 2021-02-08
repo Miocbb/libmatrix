@@ -1,9 +1,9 @@
 /**
- * @file
+ * @file lapack.h
  * @brief declaration of matrix library functions relate to lapack function.
  */
-#ifndef _MATRIX_SRC_LAPACK_H_
-#define _MATRIX_SRC_LAPACK_H_
+#ifndef _MATRIX_INCLUDE_MATRIX_DETAILS_LAPACK_H_
+#define _MATRIX_INCLUDE_MATRIX_DETAILS_LAPACK_H_
 
 #include "matrix.h"
 
