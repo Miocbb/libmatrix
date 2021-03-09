@@ -1,0 +1,6 @@
+<map id="matrix::exception::MatrixException" name="matrix::exception::MatrixException">
+<area shape="rect" id="node3" href="$classmatrix_1_1exception_1_1DimensionError.html" title="Matrix exception class relates to matrix dimemsion errors. " alt="" coords="362,5,493,47"/>
+<area shape="rect" id="node4" href="$classmatrix_1_1exception_1_1IndexRangeError.html" title="Matrix exception class relates to index range errors. " alt="" coords="362,71,493,112"/>
+<area shape="rect" id="node5" href="$classmatrix_1_1exception_1_1MatrixIOException.html" title="Matrix exception class relates to matrix I/O errors. " alt="" coords="362,136,493,177"/>
+<area shape="rect" id="node6" href="$classmatrix_1_1exception_1_1MatrixOperationError.html" title="Matrix exception class relates to matrix operation errors. " alt="" coords="356,201,499,243"/>
+</map>
